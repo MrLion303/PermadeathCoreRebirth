@@ -39,11 +39,17 @@ public final class LegacyCleanupListener implements Listener {
     }
 
     private void verifyMinecraftVersion() {
-        String runningVersion = Bukkit.getMinecraftVersion();
+        String bukkitVersion = Bukkit.getBukkitVersion();
+        String runningVersion = bukkitVersion;
+
+        int separator = bukkitVersion.indexOf('-');
+        if (separator > 0) {
+            runningVersion = bukkitVersion.substring(0, separator);
+        }
 
         if (!"26.3".equals(runningVersion)) {
             Bukkit.getLogger().severe("[NegativeStudios] PermadeathCoreRebirth solo es compatible con Minecraft 26.3.");
-            Bukkit.getLogger().severe("[NegativeStudios] Version detectada: " + runningVersion);
+            Bukkit.getLogger().severe("[NegativeStudios] Version detectada: " + runningVersion + " (Bukkit: " + bukkitVersion + ")");
             Bukkit.getPluginManager().disablePlugin(plugin);
         }
     }
