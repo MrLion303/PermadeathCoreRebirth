@@ -17,13 +17,11 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>${spigot.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
+        <!--
+            Paper es la plataforma prioritaria de desarrollo.
+            Se declara primero para compilar las integraciones especificas de Paper.
+            Sigue siendo provided: Paper NO se empaqueta dentro del plugin.
+        -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -32,7 +30,19 @@
         </dependency>
 
         <!--
-            JDA ya no se espera como librería/plugin externo.
+            Spigot se conserva como API/base de compatibilidad. El codigo comun usa
+            Bukkit/Spigot y los eventos exclusivos de Paper viven aislados en
+            event.paper para que el mismo JAR funcione tambien en Spigot.
+        -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+            JDA ya no se espera como libreria/plugin externo.
             Se empaqueta dentro del JAR final mediante maven-shade-plugin.
         -->
         <dependency>
@@ -85,7 +95,7 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
 
-                            <!-- Evita firmas inválidas al empaquetar dependencias dentro del JAR. -->
+                            <!-- Evita firmas invalidas al empaquetar dependencias dentro del JAR. -->
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
