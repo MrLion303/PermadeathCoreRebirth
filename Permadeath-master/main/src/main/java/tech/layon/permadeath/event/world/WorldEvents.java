@@ -1,7 +1,6 @@
 package tech.layon.permadeath.event.world;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -9,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import tech.layon.permadeath.Main;
+import tech.layon.permadeath.event.player.GameRule;
 
 public class WorldEvents implements Listener {
 
@@ -40,4 +40,3 @@ public class WorldEvents implements Listener {
         }
     }
 }
-
