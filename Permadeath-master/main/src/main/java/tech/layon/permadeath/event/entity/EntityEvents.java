@@ -84,8 +84,6 @@ public class EntityEvents implements Listener {
             }
         }
 
-        // TP de entidades
-        //if (e.getEntity() instanceof Creeper && instance.getDays() >= 50 && e.getEntity().getWorld().getEnvironment() == World.Environment.NORMAL) {
         if (e.getEntity() instanceof Creeper || e.getEntity() instanceof Ghast) {
             new EntityTeleport(e.getEntity(), e);
         }
@@ -95,27 +93,6 @@ public class EntityEvents implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 
         if (Main.getInstance().getDay() >= 50) {
-            if (e.getEntity() instanceof Player && e.getDamager() instanceof PolarBear) {
-
-                Player p = (Player) e.getEntity();
-                PolarBear b = (PolarBear) e.getDamager();
-
-                b.setAI(false);
-
-                p.getWorld().playSound(b.getLocation(), Sound.ENTITY_CREEPER_PRIMED, 1.0f, 1.0f);
-                final Location l = b.getLocation();
-
-                Bukkit.getScheduler().runTaskLater(Main.instance, new Runnable() {
-                    @Override
-                    public void run() {
-
-                        l.getWorld().createExplosion(l, 1.5f, true, false, b);
-                        b.remove();
-                    }
-                }, 10L);
-
-                e.setCancelled(true);
-            }
             if (e.getEntity() instanceof Player && e.getDamager() instanceof LlamaSpit) {
 
                 Player p = (Player) e.getEntity();
@@ -176,4 +153,3 @@ public class EntityEvents implements Listener {
         }
     }
 }
-
