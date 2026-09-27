@@ -31,11 +31,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--
+            JDA ya no se espera como librería/plugin externo.
+            Se empaqueta dentro del JAR final mediante maven-shade-plugin.
+        -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>5.0.0-beta.5</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -81,6 +84,18 @@
 
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+
+                            <!-- Evita firmas inválidas al empaquetar dependencias dentro del JAR. -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
 
