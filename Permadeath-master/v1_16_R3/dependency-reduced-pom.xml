@@ -52,9 +52,9 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.target>8</maven.compiler.target>
-    <maven.compiler.source>8</maven.compiler.source>
-    <craftbukkit.version>1.16.5-R0.1-SNAPSHOT</craftbukkit.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <craftbukkit.version>1.16.5-R0.1-SNAPSHOT</craftbukkit.version>
   </properties>
 </project>
