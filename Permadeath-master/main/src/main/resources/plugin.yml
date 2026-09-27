@@ -10,12 +10,13 @@ authors:
   - SebazCRC
   - vo1d_dev
 
-description: VersiÃ³n adaptada y actualizada por LAYON para NegativeStudios, desarrollada sobre la base original de PermadeathCore de SebazCRC.
+description: Versión adaptada y actualizada por LAYON para NegativeStudios, desarrollada sobre la base original de PermadeathCore de SebazCRC.
 
 website: https://github.com/MrLion303/PermadeathCoreRebirth
 
 softdepend:
   - WorldEdit
+  - SkinsRestorer
 
 commands:
   pdc:
