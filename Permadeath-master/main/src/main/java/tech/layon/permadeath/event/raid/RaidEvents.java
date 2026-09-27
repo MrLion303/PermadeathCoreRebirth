@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 import tech.layon.permadeath.Main;
 import tech.layon.permadeath.event.DifficultyChanges;
 import tech.layon.permadeath.event.LegacyCleanupListener;
+import tech.layon.permadeath.event.player.PlayerDeathSkullListener;
 import tech.layon.permadeath.event.spigot.SpigotCompatibilityListener;
 import tech.layon.permadeath.util.ServerPlatform;
 
@@ -34,6 +35,16 @@ public class RaidEvents implements Listener {
 
         plugin.getServer().getPluginManager().registerEvents(
                 new LegacyCleanupListener(plugin),
+                plugin
+        );
+
+        /*
+         * Reemplazo robusto del sistema legacy de monumentos de muerte.
+         * Captura la ubicacion real al morir y puede reutilizar la skin aplicada
+         * por SkinsRestorer incluso en servidores offline/no-premium.
+         */
+        plugin.getServer().getPluginManager().registerEvents(
+                new PlayerDeathSkullListener(plugin),
                 plugin
         );
 
