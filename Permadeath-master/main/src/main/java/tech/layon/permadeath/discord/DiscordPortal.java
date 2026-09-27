@@ -1,8 +1,6 @@
 package tech.layon.permadeath.discord;
 
 import org.bukkit.OfflinePlayer;
-import tech.layon.permadeath.Main;
-import tech.layon.permadeath.util.ServerPlatform;
 
 /**
  * Puente del bot de Discord.
@@ -16,16 +14,6 @@ public final class DiscordPortal {
     }
 
     public static boolean isJDAInstalled() {
-        /*
-         * Main consulta este metodo antes de startPlugin(). Aprovechamos ese punto
-         * temprano para detectar Paper/Spigot antes de registrar listeners o
-         * ejecutar logica especifica de plataforma.
-         */
-        Main plugin = Main.getInstance();
-        if (plugin != null) {
-            ServerPlatform.bootstrap(plugin);
-        }
-
         // JDA forma parte del propio JAR de PermadeathCoreRebirth.
         return true;
     }
