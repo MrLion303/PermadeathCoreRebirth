@@ -362,12 +362,12 @@ public final class Main extends JavaPlugin implements Listener {
                     }
                 }
 
-                if (player.hasPotionEffect(PotionEffectType.SLOW_DIGGING)) {
-                    PotionEffect e = player.getPotionEffect(PotionEffectType.SLOW_DIGGING);
+                if (player.hasPotionEffect(PotionEffectType.MINING_FATIGUE)) {
+                    PotionEffect e = player.getPotionEffect(PotionEffectType.MINING_FATIGUE);
                     if (e.getDuration() >= 4 * 60 * 20 && !getDoneEffectPlayers().contains(player)) {
                         int min = 10 * 60;
-                        player.removePotionEffect(PotionEffectType.SLOW_DIGGING);
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, min * 20, 2));
+                        player.removePotionEffect(PotionEffectType.MINING_FATIGUE);
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.MINING_FATIGUE, min * 20, 2));
                         getDoneEffectPlayers().add(player);
                     }
 
@@ -403,7 +403,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             if (getDay() >= 60) {
                 if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.SOUL_SAND) {
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30 * 20, 2));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 30 * 20, 2));
                 }
                 Integer timeForWither = player.getPersistentDataContainer().get(new NamespacedKey(this, "wither"), PersistentDataType.INTEGER);
                 if (timeForWither == null) {
@@ -941,8 +941,8 @@ public final class Main extends JavaPlugin implements Listener {
             int lvl = (getDay() >= 50 ? 1 : 0);
 
             entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, lvl));
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, lvl));
-            entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, lvl));
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, lvl));
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, lvl));
 
             if (getDay() >= 50 && getDay() < 60) {
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 0));

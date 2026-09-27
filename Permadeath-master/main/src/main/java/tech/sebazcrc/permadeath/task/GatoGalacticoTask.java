@@ -129,7 +129,7 @@ public class GatoGalacticoTask extends BukkitRunnable {
                 carlos.getEquipment().setItemInMainHandDropChance(0);
 
                 ravager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                ravager.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 1));
+                ravager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1));
                 ravager.getPersistentDataContainer().set(new NamespacedKey(Main.instance, "ultra_ravager"), PersistentDataType.BYTE, (byte) 1);
 
 
@@ -284,7 +284,7 @@ public class GatoGalacticoTask extends BukkitRunnable {
                 eq.setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
                 eq.setLeggings(new ItemStack(Material.GOLDEN_LEGGINGS));
                 eq.setBoots(new ItemStack(Material.GOLDEN_BOOTS));
-                eq.setItemInMainHand(new ItemBuilder(Material.BOW).addEnchant(Enchantment.ARROW_KNOCKBACK, 5).addEnchant(Enchantment.ARROW_DAMAGE, 100).build());
+                eq.setItemInMainHand(new ItemBuilder(Material.BOW).addEnchant(Enchantment.PUNCH, 5).addEnchant(Enchantment.POWER, 100).build());
                 eq.setItemInMainHandDropChance(0);
             }
 

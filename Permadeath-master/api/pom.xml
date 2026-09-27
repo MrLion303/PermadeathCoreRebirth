@@ -13,22 +13,7 @@
     </parent>
 
     <artifactId>api</artifactId>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <craftbukkit.version>1.20.1-R0.1-SNAPSHOT</craftbukkit.version>
-    </properties>
-
-    <repositories>
-
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-        </repository>
-
-    </repositories>
+    <packaging>jar</packaging>
 
     <dependencies>
 
@@ -41,42 +26,10 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>${craftbukkit.version}</version>
+            <version>${spigot.version}</version>
             <scope>provided</scope>
         </dependency>
 
     </dependencies>
-
-    <build>
-
-        <defaultGoal>clean package install</defaultGoal>
-
-        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-
-        <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
-
-                <executions>
-
-                    <execution>
-                        <phase>package</phase>
-
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-
-                    </execution>
-
-                </executions>
-            </plugin>
-
-        </plugins>
-        
-
-    </build>
 
 </project>

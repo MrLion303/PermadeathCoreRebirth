@@ -217,7 +217,7 @@ public class SpawnListener implements Listener {
 
                         if (clase == 3) {
 
-                            pigman.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(8.0D);
+                            pigman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(8.0D);
                             pigman.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 3));
 
                             Ghast ghast = (Ghast) plugin.getNmsHandler().spawnCustomGhast(event.getLocation(), CreatureSpawnEvent.SpawnReason.CUSTOM, false);
@@ -283,7 +283,7 @@ public class SpawnListener implements Listener {
 
                 if (plugin.getDay() < 40) {
                     ravager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                    ravager.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 0));
+                    ravager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 0));
                     ravager.setRemoveWhenFarAway(true);
                 }
             }
@@ -305,7 +305,7 @@ public class SpawnListener implements Listener {
         if (plugin.getDay() >= 30) {
             if (entity instanceof Silverfish || entity instanceof Endermite) addMobEffects(entity, 100);
             if (entity instanceof Enderman) {
-                entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, plugin.getDay() < 60 ? 1 : 9));
+                entity.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, plugin.getDay() < 60 ? 1 : 9));
 
                 if (plugin.getDay() >= 40) {
                     if (world.getEnvironment() == World.Environment.NETHER) {
@@ -334,10 +334,10 @@ public class SpawnListener implements Listener {
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 3));
                 if (plugin.getDay() >= 40) {
 
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, plugin.getDay() < 60 ? 0 : 3));
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, plugin.getDay() < 60 ? 0 : 3));
 
                     if (plugin.getDay() >= 50) {
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, plugin.getDay() < 60 ? 1 : 3));
+                        entity.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, plugin.getDay() < 60 ? 1 : 3));
                     }
                 }
             }
@@ -346,7 +346,7 @@ public class SpawnListener implements Listener {
                 event.setCancelled(true);
                 if (location.getWorld().getLivingEntities().stream().filter(entity1 -> entity1 instanceof Blaze).map(Blaze.class::cast).collect(Collectors.toList()).size() < 30) {
                     Blaze g = (Blaze) entity.getWorld().spawnEntity(event.getLocation(), EntityType.BLAZE);
-                    g.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+                    g.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, 1));
                 }
             }
 
@@ -356,7 +356,7 @@ public class SpawnListener implements Listener {
 
                 if (plugin.getDay() >= 40) {
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, 1));
 
                     if (plugin.getDay() >= 50) {
 
@@ -404,7 +404,7 @@ public class SpawnListener implements Listener {
                     return;
                 }
                 entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2));
-                entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+                entity.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, 1));
             }
 
             if (entity.getType() == EntityType.SPIDER) {
@@ -417,7 +417,7 @@ public class SpawnListener implements Listener {
                 event.setCancelled(true);
                 if (world.getNearbyEntities(location, 15, 15, 15).stream().filter(entity1 -> entity1 instanceof Vindicator).map(Vindicator.class::cast).collect(Collectors.toList()).size() < 5) {
                     Vindicator vindicator = (Vindicator) event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.VINDICATOR);
-                    vindicator.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 0));
+                    vindicator.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 0));
                     plugin.getNmsAccessor().setMaxHealth(vindicator, plugin.getNmsAccessor().getMaxHealth(vindicator) * 2, true);
                 }
             }
@@ -454,7 +454,7 @@ public class SpawnListener implements Listener {
                     ultraRavager.setCustomName(TextUtils.format("&6Ultra Ravager"));
                     ultraRavager.setCustomNameVisible(true);
                     ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                    ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 1));
+                    ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1));
                     plugin.getNmsAccessor().setMaxHealth(ultraRavager, 500.0D, true);
                 }
             }
@@ -484,11 +484,11 @@ public class SpawnListener implements Listener {
 
             if (entity instanceof Vindicator) {
                 Illager i = (Illager) entity;
-                i.getEquipment().setItemInMainHand(new ItemBuilder(Material.DIAMOND_AXE).addEnchant(Enchantment.DAMAGE_ALL, 5).build());
+                i.getEquipment().setItemInMainHand(new ItemBuilder(Material.DIAMOND_AXE).addEnchant(Enchantment.SHARPNESS, 5).build());
             }
 
             if (event.getEntityType() == EntityType.VEX) {
-                entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2));
+                entity.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, 2));
             }
 
             if (event.getEntityType() == EntityType.BLAZE) {
@@ -498,7 +498,7 @@ public class SpawnListener implements Listener {
             if (entity.getType() == EntityType.COD) {
                 if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM) return;
                 Cod cod = (Cod) entity;
-                cod.getEquipment().setItemInMainHand(new ItemBuilder(Material.WOODEN_SWORD).addEnchant(Enchantment.DAMAGE_ALL, 50).addEnchant(Enchantment.KNOCKBACK, 100).build());
+                cod.getEquipment().setItemInMainHand(new ItemBuilder(Material.WOODEN_SWORD).addEnchant(Enchantment.SHARPNESS, 50).addEnchant(Enchantment.KNOCKBACK, 100).build());
                 cod.getEquipment().setItemInMainHandDropChance(0.0f);
                 cod.setCustomName(TextUtils.format("&6Bacalao de la Muerte"));
             }
@@ -552,7 +552,7 @@ public class SpawnListener implements Listener {
                     eq.setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
                     eq.setLeggings(new ItemStack(Material.GOLDEN_LEGGINGS));
                     eq.setBoots(new ItemStack(Material.GOLDEN_BOOTS));
-                    eq.setItemInMainHand(new ItemBuilder(Material.BOW).addEnchant(Enchantment.ARROW_KNOCKBACK, 5).addEnchant(Enchantment.ARROW_DAMAGE, 100).build());
+                    eq.setItemInMainHand(new ItemBuilder(Material.BOW).addEnchant(Enchantment.PUNCH, 5).addEnchant(Enchantment.POWER, 100).build());
                     eq.setItemInMainHandDropChance(0);
 
                     event.setCancelled(false);
@@ -599,7 +599,7 @@ public class SpawnListener implements Listener {
                         ultraRavager.setCustomName(TextUtils.format("&6Ultra Ravager"));
                         ultraRavager.setCustomNameVisible(true);
                         ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                        ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 1));
+                        ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1));
                         plugin.getNmsAccessor().setMaxHealth(ultraRavager, 500.0D, true);
 
                         event.setCancelled(true);
@@ -612,8 +612,8 @@ public class SpawnListener implements Listener {
 
             if (event.getEntityType() == EntityType.VEX) {
                 Vex v = (Vex) entity;
-                v.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2));
-                v.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(7.0D);
+                v.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 2));
+                v.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(7.0D);
             }
 
             if (event.getEntityType() == EntityType.VILLAGER) {
@@ -631,7 +631,7 @@ public class SpawnListener implements Listener {
                     if (world.getNearbyEntities(location, 15, 15, 15).stream().filter(entity1 -> entity1 instanceof Evoker).map(Evoker.class::cast).collect(Collectors.toList()).size() < 5) {
                         Evoker evoker = (Evoker) event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.EVOKER);
                         plugin.getNmsAccessor().setMaxHealth(evoker, plugin.getNmsAccessor().getMaxHealth(evoker) * 2, true);
-                        evoker.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2));
+                        evoker.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, 2));
                     }
                 }
             }
@@ -677,7 +677,7 @@ public class SpawnListener implements Listener {
             if (entity instanceof Bat) {
                 entity.remove();
                 Blaze g = (Blaze) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.BLAZE);
-                g.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+                g.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, Integer.MAX_VALUE, 1));
             }
         }
 
@@ -696,7 +696,7 @@ public class SpawnListener implements Listener {
                     ultraRavager.setCustomName(TextUtils.format("&6Ultra Ravager"));
                     ultraRavager.setCustomNameVisible(true);
                     ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                    ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 1));
+                    ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1));
                     plugin.getNmsAccessor().setMaxHealth(ultraRavager, 500.0D, true);
                 }
             }
@@ -827,7 +827,7 @@ public class SpawnListener implements Listener {
             }
 
             skeleton = w.spawn(l, WitherSkeleton.class);
-            skeleton.getEquipment().setItemInMainHand(buildItem(Material.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 32765).build());
+            skeleton.getEquipment().setItemInMainHand(buildItem(Material.BOW).addEnchant(Enchantment.POWER, 32765).build());
             skeleton.getEquipment().setItemInMainHandDropChance(0.0f);
 
             skeleton.setRemoveWhenFarAway(false);
@@ -847,7 +847,7 @@ public class SpawnListener implements Listener {
                 health = (plugin.getDay() < 30 ? 20.0D : plugin.getDay() < 50 ? 40.0D : 100.0D);
 
                 if (plugin.getDay() >= 30) {
-                    armorEnchant = Enchantment.PROTECTION_ENVIRONMENTAL;
+                    armorEnchant = Enchantment.PROTECTION;
                     armorEnchantLvl = plugin.getDay() < 60 ? 4 : 5;
                     if (plugin.getDay() >= 60) armorDropChance = 0.0f;
                 }
@@ -861,10 +861,10 @@ public class SpawnListener implements Listener {
                 int actual_tactical_power_level = (plugin.getDay() < 50 ? 25 : plugin.getDay() < 60 ? 40 : 110); // Día 30
 
                 health = (plugin.getDay() < 60 ? 40.0D : 60.0D);
-                mainHand = buildItem(Material.BOW).addEnchant(Enchantment.ARROW_KNOCKBACK, punch_level).build();
+                mainHand = buildItem(Material.BOW).addEnchant(Enchantment.PUNCH, punch_level).build();
 
                 if (plugin.getDay() >= 30) {
-                    mainHand = new ItemBuilder(mainHand).addEnchant(Enchantment.ARROW_DAMAGE, actual_tactical_power_level).build();
+                    mainHand = new ItemBuilder(mainHand).addEnchant(Enchantment.POWER, actual_tactical_power_level).build();
                 }
             } else if (randomClass == 3) {
                 helmet = buildItem(Material.IRON_HELMET).build();
@@ -880,7 +880,7 @@ public class SpawnListener implements Listener {
                 health = (plugin.getDay() < 30 ? 20.0D : plugin.getDay() < 60 ? 40.0D : 100.0D);
 
                 if (plugin.getDay() >= 50) {
-                    mainHand = new ItemBuilder(mainHand).addEnchant(Enchantment.DAMAGE_ALL, infernal_skeleton_axe_sharpness).build();
+                    mainHand = new ItemBuilder(mainHand).addEnchant(Enchantment.SHARPNESS, infernal_skeleton_axe_sharpness).build();
                 }
             } else if (randomClass == 4) {
                 helmet = buildItem(Material.GOLDEN_HELMET).build();
@@ -890,7 +890,7 @@ public class SpawnListener implements Listener {
 
                 int crossbow_sharp_level = (plugin.getDay() < 30 ? 20 : plugin.getDay() < 50 ? 25 : plugin.getDay() < 60 ? 50 : 100);
 
-                mainHand = buildItem(Material.CROSSBOW).addEnchant(Enchantment.DAMAGE_ALL, crossbow_sharp_level).build();
+                mainHand = buildItem(Material.CROSSBOW).addEnchant(Enchantment.SHARPNESS, crossbow_sharp_level).build();
                 health = plugin.getDay() < 60 ? 40.0D : 60.0D;
 
                 if (plugin.getDay() >= 30) {
@@ -905,7 +905,7 @@ public class SpawnListener implements Listener {
 
                 int bow_power_level = (plugin.getDay() < 30 ? 10 : plugin.getDay() < 50 ? 50 : plugin.getDay() < 60 ? 60 : 150);
 
-                mainHand = buildItem(Material.BOW).addEnchant(Enchantment.ARROW_DAMAGE, bow_power_level).build();
+                mainHand = buildItem(Material.BOW).addEnchant(Enchantment.POWER, bow_power_level).build();
                 health = plugin.getDay() < 60 ? 40.0D : 60.0D;
             } else if (randomClass == 6) {
                 helmet = new LeatherArmorBuilder(Material.LEATHER_HELMET, 1).setColor(Color.BLUE).setUnbrekeable(true).build();
@@ -940,7 +940,7 @@ public class SpawnListener implements Listener {
                 health = (plugin.getDay() < 30 ? 20.0D : plugin.getDay() < 50 ? 40.0D : 100.0D);
 
                 if (plugin.getDay() >= 30) {
-                    armorEnchant = Enchantment.PROTECTION_ENVIRONMENTAL;
+                    armorEnchant = Enchantment.PROTECTION;
                     armorEnchantLvl = plugin.getDay() < 60 ? 4 : 5;
                     if (plugin.getDay() >= 60) armorDropChance = 0.0f;
                 }
@@ -1216,7 +1216,7 @@ public class SpawnListener implements Listener {
 
             if (plugin.getDay() < 60 && plugin.getDay() >= 50) {
                 if (event.getEntity().getType() == EntityType.GIANT) {
-                    event.getDrops().add(new ItemBuilder(Material.BOW).setDisplayName(TextUtils.format("&bArco de Gigante")).addEnchant(Enchantment.ARROW_DAMAGE, 10).build());
+                    event.getDrops().add(new ItemBuilder(Material.BOW).setDisplayName(TextUtils.format("&bArco de Gigante")).addEnchant(Enchantment.POWER, 10).build());
                 }
 
                 if (event.getEntity().getType() == EntityType.WITHER_SKELETON) {
@@ -1296,7 +1296,7 @@ public class SpawnListener implements Listener {
         carlos.getEquipment().setItemInMainHandDropChance(0);
 
         ravager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-        ravager.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 1));
+        ravager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1));
         ravager.getPersistentDataContainer().set(new NamespacedKey(plugin, "ultra_ravager"), PersistentDataType.BYTE, (byte) 1);
 
         jess.setRemoveWhenFarAway(true);
@@ -1332,7 +1332,7 @@ public class SpawnListener implements Listener {
                 skeleton.getEquipment().setBoots(new LeatherArmorBuilder(Material.LEATHER_BOOTS, 1).setColor(Color.fromRGB(255, 182, 193)).build());
 
                 int enchantLevel = (int) (Math.random() * 5) + 1;
-                skeleton.getEquipment().setItemInMainHand(new ItemBuilder(PermadeathItems.craftNetheriteSword()).addEnchant(Enchantment.DAMAGE_ALL, enchantLevel).build());
+                skeleton.getEquipment().setItemInMainHand(new ItemBuilder(PermadeathItems.craftNetheriteSword()).addEnchant(Enchantment.SHARPNESS, enchantLevel).build());
 
                 skeleton.getEquipment().setChestplateDropChance(0);
                 skeleton.getEquipment().setBootsDropChance(0);
@@ -1345,8 +1345,8 @@ public class SpawnListener implements Listener {
 
             if (p > 60 && p <= 75) {
                 Vex vex = beginningWorld.spawn(location, Vex.class);
-                vex.getEquipment().setHelmet(new ItemBuilder(Material.valueOf("HONEY_BLOCK")).addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 4).build());
-                vex.getEquipment().setItemInMainHand(new ItemBuilder(Material.END_CRYSTAL).addEnchant(Enchantment.DAMAGE_ALL, 15).addEnchant(Enchantment.KNOCKBACK, 10).build());
+                vex.getEquipment().setHelmet(new ItemBuilder(Material.valueOf("HONEY_BLOCK")).addEnchant(Enchantment.PROTECTION, 4).build());
+                vex.getEquipment().setItemInMainHand(new ItemBuilder(Material.END_CRYSTAL).addEnchant(Enchantment.SHARPNESS, 15).addEnchant(Enchantment.KNOCKBACK, 10).build());
                 vex.getEquipment().setHelmetDropChance(0);
                 vex.getEquipment().setItemInMainHandDropChance(0);
 
@@ -1370,7 +1370,7 @@ public class SpawnListener implements Listener {
     public ItemStack getPotionItemStack() {
         ItemStack arrow = new ItemStack(Material.TIPPED_ARROW);
         PotionMeta meta = (PotionMeta) arrow.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.INSTANT_DAMAGE, false, true));
+        meta.setBasePotionData(new PotionData(PotionType.HARMING, false, true));
         arrow.setItemMeta(meta);
         return arrow;
     }
@@ -1379,7 +1379,7 @@ public class SpawnListener implements Listener {
 
         ItemStack arrow = new ItemStack(Material.TIPPED_ARROW);
         PotionMeta meta = (PotionMeta) arrow.getItemMeta();
-        meta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, 3 * 60 * 20, 2), false);
+        meta.addCustomEffect(new PotionEffect(PotionEffectType.SLOWNESS, 3 * 60 * 20, 2), false);
         meta.addCustomEffect(new PotionEffect(PotionEffectType.WEAKNESS, 3 * 60 * 20, 0), false);
         meta.addCustomEffect(new PotionEffect(PotionEffectType.GLOWING, 3 * 60 * 20, 0), false);
         meta.addCustomEffect(new PotionEffect(PotionEffectType.POISON, 3 * 60 * 20, 2), false);

@@ -34,10 +34,10 @@ public final class InfernalNetherite implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
         meta.setUnbreakable(true);
 
@@ -59,14 +59,14 @@ public final class InfernalNetherite implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 8, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
 
         //AttributeModifier modifier3 = new AttributeModifier(UUID.randomUUID(), "generic.maxHealth", 2, AttributeModifier.Operation.ADD_NUMBER, slot);
-        //meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, modifier3);
+        //meta.addAttributeModifier(Attribute.MAX_HEALTH, modifier3);
 
         meta.setUnbreakable(true);
 
@@ -88,13 +88,13 @@ public final class InfernalNetherite implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 6, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
         //AttributeModifier modifier3 = new AttributeModifier(UUID.randomUUID(), "generic.maxHealth", 2, AttributeModifier.Operation.ADD_NUMBER, slot);
-        //meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, modifier3);
+        //meta.addAttributeModifier(Attribute.MAX_HEALTH, modifier3);
 
         meta.setUnbreakable(true);
 
@@ -117,10 +117,10 @@ public final class InfernalNetherite implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
         meta.setUnbreakable(true);
 

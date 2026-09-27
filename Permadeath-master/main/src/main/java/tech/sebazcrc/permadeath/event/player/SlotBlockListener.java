@@ -136,7 +136,7 @@ public class SlotBlockListener implements Listener {
                         }
                     }
 
-                    meta.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 20, 3), true);
+                    meta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20, 3), true);
                     s.setItemMeta(meta);
                     potion.setItem(s);
 
@@ -167,7 +167,7 @@ public class SlotBlockListener implements Listener {
                         }
                     }
 
-                    meta.addCustomEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 20, 4), true);
+                    meta.addCustomEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 20, 4), true);
                     s.setItemMeta(meta);
                     potion.setItem(s);
                 }

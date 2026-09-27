@@ -77,7 +77,7 @@ public class EntityEvents implements Listener {
             }
         }
 
-        if (e.getEntity().getType() == EntityType.DROPPED_ITEM && e.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && e.getEntity().getWorld().getEnvironment() == World.Environment.THE_END) {
+        if (e.getEntity().getType() == EntityType.ITEM && e.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && e.getEntity().getWorld().getEnvironment() == World.Environment.THE_END) {
             Item item = (Item) e.getEntity();
             if (item.getItemStack().getType() == Material.SHULKER_SHELL) {
                 e.setCancelled(true);
@@ -121,7 +121,7 @@ public class EntityEvents implements Listener {
                 Player p = (Player) e.getEntity();
 
                 p.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 30 * 20, 2));
-                p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 10 * 20, 0));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 10 * 20, 0));
 
                 p.setVelocity(p.getVelocity().multiply(3));
             }

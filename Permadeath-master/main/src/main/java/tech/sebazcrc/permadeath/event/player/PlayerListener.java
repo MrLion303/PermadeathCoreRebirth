@@ -150,7 +150,7 @@ public class PlayerListener implements Listener {
                 }
 
                 Bukkit.broadcastMessage(TextUtils.format(Main.prefix + "&e¡Ha comenzado el modo UHC!"));
-                Main.instance.world.setGameRule(GameRule.NATURAL_REGENERATION, false);
+                Main.instance.world.setGameRule(GameRule.NATURAL_HEALTH_REGENERATION, false);
             }
 
             scheduler.scheduleSyncDelayedTask(Main.instance, new Runnable() {
@@ -325,7 +325,7 @@ public class PlayerListener implements Listener {
             Location playerbed = event.getBed().getLocation().add(0, 1, 0);
 
             Main.instance.world.playSound(playerbed, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 1.0F);
-            Main.instance.world.spawnParticle(Particle.EXPLOSION_HUGE, playerbed, 1);
+            Main.instance.world.spawnParticle(Particle.EXPLOSION_EMITTER, playerbed, 1);
 
             if (Main.getInstance().getDay() >= 50) {
                 if (new SplittableRandom().nextInt(100) + 1 <= 10) {
@@ -717,8 +717,8 @@ public class PlayerListener implements Listener {
         if (Main.getInstance().getDay() >= 50) {
             if (e.getItem() != null) {
                 if (e.getItem().getType() == Material.MILK_BUCKET) {
-                    if (e.getPlayer().hasPotionEffect(PotionEffectType.SLOW_DIGGING)) {
-                        PotionEffect effect = e.getPlayer().getPotionEffect(PotionEffectType.SLOW_DIGGING);
+                    if (e.getPlayer().hasPotionEffect(PotionEffectType.MINING_FATIGUE)) {
+                        PotionEffect effect = e.getPlayer().getPotionEffect(PotionEffectType.MINING_FATIGUE);
                         Bukkit.getScheduler().runTaskLater(Main.getInstance(), new Runnable() {
                             @Override
                             public void run() {
@@ -748,12 +748,12 @@ public class PlayerListener implements Listener {
                         @Override
                         public void run() {
 
-                            e.getPlayer().removePotionEffect(PotionEffectType.CONFUSION);
+                            e.getPlayer().removePotionEffect(PotionEffectType.NAUSEA);
                             e.getPlayer().removePotionEffect(PotionEffectType.POISON);
                             e.getPlayer().removePotionEffect(PotionEffectType.HUNGER);
                             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.POISON, Integer.MAX_VALUE, 3));
                             e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, Integer.MAX_VALUE, 2));
-                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, Integer.MAX_VALUE, 1));
+                            e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, Integer.MAX_VALUE, 1));
                         }
                     }, 5L);
                 }
@@ -792,7 +792,7 @@ public class PlayerListener implements Listener {
 
                 if (s.getType() == Material.PUMPKIN_PIE) {
 
-                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.HARM, 1, 3));
+                    e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 1, 3));
                 }
             }
         }
@@ -859,10 +859,10 @@ public class PlayerListener implements Listener {
             centerBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.RED_CARPET);
 
             AreaEffectCloud a = (AreaEffectCloud) Main.getInstance().endWorld.spawnEntity(centerBlock.getRelative(BlockFace.UP).getLocation(), EntityType.AREA_EFFECT_CLOUD);
-            a.addCustomEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 0), false);
+            a.addCustomEffect(new PotionEffect(PotionEffectType.RESISTANCE, 20 * 5, 0), false);
             a.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 5, 0), false);
             a.setDuration(999999);
-            a.setParticle(Particle.BLOCK_CRACK, Material.AIR.createBlockData());
+            a.setParticle(Particle.BLOCK, Material.AIR.createBlockData());
             a.setRadius(4.0F);
 
             ma.getConfig().set("CreatedRegenZone", true);
@@ -1212,7 +1212,7 @@ public class PlayerListener implements Listener {
                     }
 
                     if (found >= 8) {
-                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
+                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.INFINITY, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
                     } else {
 
                         e.getInventory().setResult(null);
@@ -1236,7 +1236,7 @@ public class PlayerListener implements Listener {
                     }
 
                     if (found >= 8 && enoughGaps) {
-                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
+                        e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.INFINITY, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
                     } else {
 
                         e.getInventory().setResult(null);
@@ -1261,7 +1261,7 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 if (found >= 8) {
-                    e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Super Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
+                    e.getInventory().setResult(new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Super Golden Apple +")).addEnchant(Enchantment.INFINITY, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build());
                 }
             }
         }

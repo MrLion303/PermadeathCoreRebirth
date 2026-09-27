@@ -26,7 +26,7 @@ public class WorldEvents implements Listener {
                     Main.instance.getBeginningManager().setClosed(false);
                 }
                 for (World w : Bukkit.getWorlds()) {
-                    w.setGameRule(GameRule.NATURAL_REGENERATION, true);
+                    w.setGameRule(GameRule.NATURAL_HEALTH_REGENERATION, true);
                 }
             }
         } else {

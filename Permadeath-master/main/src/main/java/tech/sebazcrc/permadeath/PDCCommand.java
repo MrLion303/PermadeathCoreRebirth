@@ -265,7 +265,7 @@ public class PDCCommand implements CommandExecutor {
                         p.sendMessage("Lingering: " + Main.DISABLED_LINGERING);
                     } else if (args[1].equalsIgnoreCase("summonske")) {
                         WitherSkeleton skeleton = p.getWorld().spawn(p.getLocation().clone(), WitherSkeleton.class);
-                        skeleton.getEquipment().setItemInMainHand(new ItemBuilder(Material.BOW).addEnchant(Enchantment.ARROW_DAMAGE, 32765).build());
+                        skeleton.getEquipment().setItemInMainHand(new ItemBuilder(Material.BOW).addEnchant(Enchantment.POWER, 32765).build());
                         skeleton.getEquipment().setItemInMainHandDropChance(0.0f);
 
                         skeleton.setRemoveWhenFarAway(false);
@@ -399,7 +399,7 @@ public class PDCCommand implements CommandExecutor {
                     if (args[1].equalsIgnoreCase("bendicion")) {
                         player.sendMessage(TextUtils.format("&aSe ha otorgado la bendición de The Beginning a &b" + off.getName()));
                         Bukkit.broadcastMessage(TextUtils.format(Main.prefix + "&d&lEnhorabuena " + off.getName() + " has recibido la bendición del comienzo por entrar primero a The Beginning. Suerte."));
-                        off.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (60 * 60 * 12 * 20), 1));
+                        off.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, (60 * 60 * 12 * 20), 1));
                     }
 
                     if (args[1].equalsIgnoreCase("maldicion")) {
@@ -407,7 +407,7 @@ public class PDCCommand implements CommandExecutor {
                         Bukkit.broadcastMessage(TextUtils.format(Main.prefix + "&d&l" + off.getName() + ", ¡Desgracia! has recibido la maldición de The Beginning por entrar de último."));
                         Bukkit.broadcastMessage(TextUtils.format("&d&l¡Sufre y muere por lento! NO puedes usar cubos de leche dentro de Permadeath por 12 horas o serás PERMABANEADO."));
                         off.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, (60 * 60 * 12 * 20), 0));
-                        off.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (60 * 60 * 12 * 20), 0));
+                        off.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, (60 * 60 * 12 * 20), 0));
                     }
 
                 } else if (args[0].equalsIgnoreCase("speedrun")) {

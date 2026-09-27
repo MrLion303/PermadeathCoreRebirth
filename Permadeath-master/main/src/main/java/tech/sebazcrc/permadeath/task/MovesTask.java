@@ -85,7 +85,7 @@ public class MovesTask extends BukkitRunnable {
                     a.setParticle(Particle.CLOUD);
                     a.setRadius(5.0F);
                     a.setDuration(15 * 20);
-                    a.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 5, 3), false);
+                    a.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 5, 3), false);
                     a.setColor(Color.WHITE);
                 }
             }

@@ -76,7 +76,7 @@ public class EndManager implements Listener {
         AreaEffectCloud area = e.getEntity();
 
         if (isInEnd(area.getLocation())) {
-            if (area.getParticle() == Particle.VILLAGER_HAPPY) {
+            if (area.getParticle() == Particle.HAPPY_VILLAGER) {
                 for (Entity all : e.getAffectedEntities()) {
                     if (all instanceof Player) {
                         e.setCancelled(true);
@@ -95,7 +95,7 @@ public class EndManager implements Listener {
                 }
             }
 
-            if (area.getParticle() == Particle.SMOKE_NORMAL) {
+            if (area.getParticle() == Particle.SMOKE) {
                 for (Entity all : e.getAffectedEntities()) {
                     if (all instanceof Player) {
                         Player p = (Player) all;
@@ -163,12 +163,12 @@ public class EndManager implements Listener {
         if (entity instanceof Shulker && ((Shulker) entity).getColor() != DyeColor.RED) {
             boolean isSure = true;
             for (Entity near : e.getEntity().getNearbyEntities(2, 2, 2)) {
-                if (near.getType() == EntityType.PRIMED_TNT) {
+                if (near.getType() == EntityType.TNT) {
                     isSure = false;
                 }
             }
             if (isSure) {
-                TNTPrimed tnt = (TNTPrimed) e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.PRIMED_TNT);
+                TNTPrimed tnt = (TNTPrimed) e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.TNT);
                 tnt.setFuseTicks(80);
 
                 tnt.setCustomName("tntdeath");
@@ -214,7 +214,7 @@ public class EndManager implements Listener {
 
         if (isInEnd(t.getLocation())) {
 
-            if (e.getEntity().getType() == EntityType.ENDER_CRYSTAL && main.getTask() != null) {
+            if (e.getEntity().getType() == EntityType.END_CRYSTAL && main.getTask() != null) {
 
                 if (alreadyExploded.contains(e.getLocation())) return;
 
@@ -314,7 +314,7 @@ public class EndManager implements Listener {
                 for (Entity n : e.getLocation().getWorld().getEntitiesByClass(EnderDragon.class)) {
                     if (n.isValid() && !n.isDead()) {
                         n.setCustomName(TextUtils.format(instance.getConfig().getString("Toggles.End.PermadeathDemon.DisplayName")));
-                        ((LivingEntity) n).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(instance.getConfig().getInt("Toggles.End.PermadeathDemon.Health"));
+                        ((LivingEntity) n).getAttribute(Attribute.MAX_HEALTH).setBaseValue(instance.getConfig().getInt("Toggles.End.PermadeathDemon.Health"));
                         ((LivingEntity) n).setHealth(instance.getConfig().getInt("Toggles.End.PermadeathDemon.Health"));
                         main.setTask(new EndTask(main, (EnderDragon) n));
                         main.getTask().runTaskTimer(main, 0, 20L);
@@ -438,7 +438,7 @@ public class EndManager implements Listener {
 
                         w.getBlock().setType(Material.AIR);
 
-                        TNTPrimed tnt = (TNTPrimed) s.getWorld().spawnEntity(w, EntityType.PRIMED_TNT);
+                        TNTPrimed tnt = (TNTPrimed) s.getWorld().spawnEntity(w, EntityType.TNT);
                         tnt.setFuseTicks(40);
 
                         tnt.setCustomName("tnt");
@@ -463,7 +463,7 @@ public class EndManager implements Listener {
                         return;
                     }
 
-                    TNTPrimed tnt = (TNTPrimed) s.getWorld().spawnEntity(e.getHitEntity().getLocation(), EntityType.PRIMED_TNT);
+                    TNTPrimed tnt = (TNTPrimed) s.getWorld().spawnEntity(e.getHitEntity().getLocation(), EntityType.TNT);
                     tnt.setFuseTicks(20);
 
                     tnt.setCustomName("tnt");
@@ -476,7 +476,7 @@ public class EndManager implements Listener {
 
     public static void spawnFireworks(Location location, int amount) {
         Location loc = location;
-        Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+        Firework fw = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK_ROCKET);
         FireworkMeta fwm = fw.getFireworkMeta();
 
         fwm.setPower(2);
@@ -486,7 +486,7 @@ public class EndManager implements Listener {
         fw.detonate();
 
         for (int i = 0; i < amount; i++) {
-            Firework fw2 = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+            Firework fw2 = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK_ROCKET);
             fw2.setFireworkMeta(fwm);
         }
     }

@@ -1,28 +1,26 @@
 package tech.sebazcrc.permadeath.util;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
 
-public class VersionManager {
-    @Getter
-    private static final String version;
-    @Getter
-    private static MinecraftVersion minecraftVersion;
+public final class VersionManager {
 
-    static {
-        version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3].substring(1);
-        try {
-            minecraftVersion = MinecraftVersion.valueOf("v" + getRev());
-        } catch (Exception ignored) {
-        }
+    private static final String REVISION = "26_3";
+
+    @Getter
+    private static final String version = REVISION;
+
+    @Getter
+    private static final MinecraftVersion minecraftVersion = MinecraftVersion.v26_3;
+
+    private VersionManager() {
     }
 
     public static String getRev() {
-        return getVersion();
+        return REVISION;
     }
 
     public static boolean isValidVersionSet() {
-        return minecraftVersion != null;
+        return true;
     }
 
     public static String getFormattedVersion() {
@@ -30,6 +28,6 @@ public class VersionManager {
     }
 
     public static boolean isRunningPostNetherUpdate() {
-        return minecraftVersion != MinecraftVersion.v1_15_R1;
+        return true;
     }
 }

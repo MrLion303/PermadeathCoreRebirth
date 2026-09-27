@@ -153,7 +153,7 @@ public class RecipeManager {
 
     private void registerHyperGAP() {
 
-        ItemStack s = new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build();
+        ItemStack s = new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Hyper Golden Apple +")).addEnchant(Enchantment.INFINITY, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build();
         String id = "hyper_golden_apple";
         NamespacedKey key = new NamespacedKey(instance, id);
         ShapedRecipe recipe = new ShapedRecipe(key, s);
@@ -169,7 +169,7 @@ public class RecipeManager {
 
     private void registerSuperGAP() {
 
-        ItemStack s = new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Super Golden Apple +")).addEnchant(Enchantment.ARROW_INFINITE, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build();
+        ItemStack s = new ItemBuilder(Material.GOLDEN_APPLE, 1).setDisplayName(TextUtils.format("&6Super Golden Apple +")).addEnchant(Enchantment.INFINITY, 1).addItemFlag(ItemFlag.HIDE_ENCHANTS).build();
 
         NamespacedKey key = new NamespacedKey(instance, "super_golden_apple");
         ShapedRecipe recipe = new ShapedRecipe(key, s);

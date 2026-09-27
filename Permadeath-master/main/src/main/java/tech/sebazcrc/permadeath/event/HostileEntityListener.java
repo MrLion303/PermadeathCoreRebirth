@@ -46,8 +46,8 @@ public class HostileEntityListener implements Listener {
 
     private void injectHostileBehavior(LivingEntity entity) {
         instance.getNmsAccessor().injectHostilePathfinders(entity);
-        if (entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE) == null) {
-            instance.getNmsAccessor().registerAttribute(Attribute.GENERIC_ATTACK_DAMAGE, 8.0D, entity);
+        if (entity.getAttribute(Attribute.ATTACK_DAMAGE) == null) {
+            instance.getNmsAccessor().registerAttribute(Attribute.ATTACK_DAMAGE, 8.0D, entity);
         }
     }
 

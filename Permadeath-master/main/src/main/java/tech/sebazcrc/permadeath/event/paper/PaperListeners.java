@@ -92,8 +92,8 @@ public class PaperListeners implements Listener {
             } else {
 
                 if (random.nextBoolean()) {
-                    a.setParticle(Particle.SMOKE_NORMAL);
-                    a.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 20, 1), false);
+                    a.setParticle(Particle.SMOKE);
+                    a.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20, 1), false);
                 } else {
                     if (highest.getY() > 0) {
                         for (Block all : toChange) {
@@ -167,7 +167,7 @@ public class PaperListeners implements Listener {
         if (main.getDay() < 50) {
             if (e.getPlayer().getWorld().getName().equalsIgnoreCase(main.world.getName()) || e.getPlayer().getWorld().getName().equalsIgnoreCase(main.getBeginningManager().getBeginningWorld().getName())) {
                 e.getPlayer().setNoDamageTicks(e.getPlayer().getMaximumNoDamageTicks());
-                e.getPlayer().damage(e.getPlayer().getHealth() + 1.0D, null);
+                e.getPlayer().damage(e.getPlayer().getHealth() + 1.0D);
                 e.getPlayer().setNoDamageTicks(0);
                 Bukkit.broadcastMessage(TextUtils.format("&c&lEl jugador &4&l" + e.getPlayer().getName() + " &c&lentró a TheBeginning antes de tiempo."));
             }

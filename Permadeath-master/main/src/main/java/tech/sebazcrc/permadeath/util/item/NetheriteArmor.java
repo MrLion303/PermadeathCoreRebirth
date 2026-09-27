@@ -41,10 +41,10 @@ public final class NetheriteArmor implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
         meta.setUnbreakable(true);
 
@@ -66,14 +66,14 @@ public final class NetheriteArmor implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 8, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
 
         //AttributeModifier modifier3 = new AttributeModifier(UUID.randomUUID(), "generic.maxHealth", 2, AttributeModifier.Operation.ADD_NUMBER, slot);
-        //meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, modifier3);
+        //meta.addAttributeModifier(Attribute.MAX_HEALTH, modifier3);
 
         meta.setUnbreakable(true);
 
@@ -95,13 +95,13 @@ public final class NetheriteArmor implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 6, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
         //AttributeModifier modifier3 = new AttributeModifier(UUID.randomUUID(), "generic.maxHealth", 2, AttributeModifier.Operation.ADD_NUMBER, slot);
-        //meta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, modifier3);
+        //meta.addAttributeModifier(Attribute.MAX_HEALTH, modifier3);
 
         meta.setUnbreakable(true);
 
@@ -123,10 +123,10 @@ public final class NetheriteArmor implements Listener {
         // CASCO 3, PECHERA 8, PANTALONES 6, BOTAS 3
 
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "generic.armor", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR, modifier);
+        meta.addAttributeModifier(Attribute.ARMOR, modifier);
 
         AttributeModifier modifier2 = new AttributeModifier(UUID.randomUUID(), "generic.armorToughness", 3, AttributeModifier.Operation.ADD_NUMBER, slot);
-        meta.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, modifier2);
+        meta.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, modifier2);
 
         meta.setUnbreakable(true);
 
@@ -169,7 +169,7 @@ public final class NetheriteArmor implements Listener {
 
     public static void setupHealth(Player p) {
         Double maxHealth = getAvailableMaxHealth(p);
-        p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
+        p.getAttribute(Attribute.MAX_HEALTH).setBaseValue(maxHealth);
     }
 
     public static Double getAvailableMaxHealth(Player p) {
@@ -203,7 +203,7 @@ public final class NetheriteArmor implements Listener {
 
         if (currentInfernalPieces >= 4) {
             maxHealth += 10.0D;
-            p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 3, 0));
+            p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 20 * 3, 0));
         }
 
         if (Main.getInstance().getDay() >= 40) {

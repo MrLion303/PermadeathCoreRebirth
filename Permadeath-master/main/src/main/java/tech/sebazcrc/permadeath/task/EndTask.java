@@ -59,7 +59,7 @@ public class EndTask extends BukkitRunnable {
         }
         this.eggLocation = main.endWorld.getHighestBlockAt(new Location(main.endWorld, 0, y, 0)).getLocation();
 
-        enderDragon.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(Main.instance.getConfig().getInt("Toggles.End.PermadeathDemon.Health"));
+        enderDragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(Main.instance.getConfig().getInt("Toggles.End.PermadeathDemon.Health"));
         enderDragon.setHealth(Main.instance.getConfig().getInt("Toggles.End.PermadeathDemon.Health"));
 
         teleportLocation = eggLocation.clone().add(0, 2, 0);
@@ -94,7 +94,7 @@ public class EndTask extends BukkitRunnable {
                 if (time >= 1) {
                     regenTime.replace(loc, time, time - 1);
                 } else {
-                    loc.getWorld().spawnEntity(loc, EntityType.ENDER_CRYSTAL);
+                    loc.getWorld().spawnEntity(loc, EntityType.END_CRYSTAL);
                     regenTime.remove(loc);
                     if (loc.getWorld().getBlockAt(loc) != null) {
                         if (loc.getWorld().getBlockAt(loc).getType() == Material.BEDROCK || loc.getWorld().getBlockAt(loc).getType() == Material.AIR) {
@@ -136,11 +136,11 @@ public class EndTask extends BukkitRunnable {
     private void tickDemonPhase() {
         if (currentDemonPhase == DemonPhase.ENRAGED) {
             EnderDragon dragon = (EnderDragon) enderDragon;
-            dragon.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 7));
+            dragon.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 7));
             dragon.setCustomName(TextUtils.format(main.getConfig().getString("Toggles.End.PermadeathDemon.DisplayNameEnraged")));
         } else {
             EnderDragon dragon = (EnderDragon) enderDragon;
-            dragon.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 5));
+            dragon.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 5));
         }
     }
 
@@ -231,7 +231,7 @@ public class EndTask extends BukkitRunnable {
                     for (Enderman mans : endermen) {
                         AreaEffectCloud a = (AreaEffectCloud) main.endWorld.spawnEntity(main.endWorld.getHighestBlockAt(mans.getLocation()).getLocation().add(0, 1, 0), EntityType.AREA_EFFECT_CLOUD);
                         a.setRadius(10.0F);
-                        a.setParticle(Particle.VILLAGER_HAPPY);
+                        a.setParticle(Particle.HAPPY_VILLAGER);
                         a.setColor(Color.GREEN);
 
                         a.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 999999, 0), false);
@@ -259,19 +259,19 @@ public class EndTask extends BukkitRunnable {
 
             if (enderDragon.getPhase() != EnderDragon.Phase.DYING && !attack360 && enderDragon.getLocation().distance(eggLocation) >= 15) {
 
-                TNTPrimed tnt1 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(3, 0, -3), EntityType.PRIMED_TNT);
+                TNTPrimed tnt1 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(3, 0, -3), EntityType.TNT);
                 tnt1.setFuseTicks(60);
                 tnt1.setYield(tnt1.getYield() * 2);
                 tnt1.setCustomName("dragontnt");
                 tnt1.setCustomNameVisible(false);
 
-                TNTPrimed tnt2 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(3, 0, 3), EntityType.PRIMED_TNT);
+                TNTPrimed tnt2 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(3, 0, 3), EntityType.TNT);
                 tnt2.setFuseTicks(60);
                 tnt2.setYield(tnt2.getYield() * 2);
                 tnt2.setCustomName("dragontnt");
                 tnt2.setCustomNameVisible(false);
 
-                TNTPrimed tnt3 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(3, 0, 0), EntityType.PRIMED_TNT);
+                TNTPrimed tnt3 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(3, 0, 0), EntityType.TNT);
                 tnt3.setFuseTicks(60);
                 tnt3.setYield(tnt3.getYield() * 2);
                 tnt3.setCustomName("dragontnt");
@@ -279,19 +279,19 @@ public class EndTask extends BukkitRunnable {
 
                 //
 
-                TNTPrimed tnt4 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(-3, 0, 3), EntityType.PRIMED_TNT);
+                TNTPrimed tnt4 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(-3, 0, 3), EntityType.TNT);
                 tnt4.setFuseTicks(60);
                 tnt4.setYield(tnt4.getYield() * 2);
                 tnt4.setCustomName("dragontnt");
                 tnt4.setCustomNameVisible(false);
 
-                TNTPrimed tnt5 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(-3, 0, -3), EntityType.PRIMED_TNT);
+                TNTPrimed tnt5 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(-3, 0, -3), EntityType.TNT);
                 tnt5.setFuseTicks(60);
                 tnt5.setYield(tnt5.getYield() * 2);
                 tnt5.setCustomName("dragontnt");
                 tnt5.setCustomNameVisible(false);
 
-                TNTPrimed tnt6 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(-3, 0, 0), EntityType.PRIMED_TNT);
+                TNTPrimed tnt6 = (TNTPrimed) enderDragon.getWorld().spawnEntity(enderDragon.getLocation().add(-3, 0, 0), EntityType.TNT);
                 tnt6.setFuseTicks(60);
                 tnt6.setYield(tnt6.getYield() * 2);
                 tnt6.setCustomName("dragontnt");
@@ -337,7 +337,7 @@ public class EndTask extends BukkitRunnable {
                         AreaEffectCloud eff = (AreaEffectCloud) main.endWorld.spawnEntity(highest, EntityType.AREA_EFFECT_CLOUD);
 
                         eff.setParticle(Particle.DAMAGE_INDICATOR);
-                        eff.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 20 * 5, 1), false);
+                        eff.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20 * 5, 1), false);
                         eff.setRadius(3.0F);
                     } else {
 
@@ -346,7 +346,7 @@ public class EndTask extends BukkitRunnable {
                         AreaEffectCloud eff = (AreaEffectCloud) main.endWorld.spawnEntity(highest, EntityType.AREA_EFFECT_CLOUD);
 
                         eff.setParticle(Particle.DAMAGE_INDICATOR);
-                        eff.addCustomEffect(new PotionEffect(PotionEffectType.HARM, 20 * 5, 1), false);
+                        eff.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20 * 5, 1), false);
                         eff.setRadius(3.0F);
                     }
                 }
