@@ -1,17 +1,18 @@
 name: Permadeath
 version: 1.3
-main: tech.sebazcrc.permadeath.Main
+main: tech.layon.permadeath.Main
 
 load: STARTUP
 api-version: '26.3'
 
 authors:
+  - LAYON
   - SebazCRC
   - vo1d_dev
 
-description: Recreación del Plugin "PermaDeath" de la serie de ElRichMC, este plugin no intenta reemplazar al original sino crear una copia similar para la comunidad.
+description: VersiÃ³n adaptada y actualizada por LAYON para NegativeStudios, desarrollada sobre la base original de PermadeathCore de SebazCRC.
 
-website: https://github.com/SebazCRC
+website: https://github.com/MrLion303/PermadeathCoreRebirth
 
 softdepend:
   - WorldEdit

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>tech.sebazcrc.permadeath</groupId>
+  <groupId>tech.layon.permadeath</groupId>
   <artifactId>Permadeath</artifactId>
   <packaging>pom</packaging>
   <version>1.3</version>
@@ -20,7 +20,7 @@
               <relocations>
                 <relocation>
                   <pattern>de.exlll.configlib</pattern>
-                  <shadedPattern>tech.sebazcrc.permadeath.configlib</shadedPattern>
+                  <shadedPattern>tech.layon.permadeath.configlib</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -60,3 +60,4 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
+
