@@ -10,13 +10,39 @@ import org.bukkit.potion.PotionEffectType;
 import tech.layon.permadeath.Main;
 import tech.layon.permadeath.event.DifficultyChanges;
 import tech.layon.permadeath.event.LegacyCleanupListener;
+import tech.layon.permadeath.event.spigot.SpigotCompatibilityListener;
+import tech.layon.permadeath.util.ServerPlatform;
 
 public class RaidEvents implements Listener {
 
     public RaidEvents() {
         Main plugin = Main.getInstance();
-        plugin.getServer().getPluginManager().registerEvents(new DifficultyChanges(plugin), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new LegacyCleanupListener(plugin), plugin);
+
+        /*
+         * Paper se detecta primero. Si estamos en Paper, Main.runningPaperSpigot
+         * queda activo y Main registrara PaperListeners al llegar al dia 30.
+         *
+         * En Spigot registramos fallbacks Bukkit/Spigot para las mecanicas que
+         * originalmente dependian de eventos exclusivos de Paper.
+         */
+        ServerPlatform.bootstrap(plugin);
+
+        plugin.getServer().getPluginManager().registerEvents(
+                new DifficultyChanges(plugin),
+                plugin
+        );
+
+        plugin.getServer().getPluginManager().registerEvents(
+                new LegacyCleanupListener(plugin),
+                plugin
+        );
+
+        if (ServerPlatform.isSpigot()) {
+            plugin.getServer().getPluginManager().registerEvents(
+                    new SpigotCompatibilityListener(plugin),
+                    plugin
+            );
+        }
     }
 
     @EventHandler
@@ -36,7 +62,11 @@ public class RaidEvents implements Listener {
                         player.removePotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE);
 
                         int min = 5 * 60;
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.HERO_OF_THE_VILLAGE, min, effect.getAmplifier()));
+                        player.addPotionEffect(new PotionEffect(
+                                PotionEffectType.HERO_OF_THE_VILLAGE,
+                                min,
+                                effect.getAmplifier()
+                        ));
                     }
                 }
             }
