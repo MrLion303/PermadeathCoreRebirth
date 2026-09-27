@@ -3,7 +3,11 @@ package tech.layon.permadeath.event.paper;
 import com.destroystokyo.paper.event.entity.EnderDragonFireballHitEvent;
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
 import com.destroystokyo.paper.event.player.PlayerTeleportEndGatewayEvent;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.EndGateway;
@@ -11,108 +15,116 @@ import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 import tech.layon.permadeath.Main;
-import tech.layon.permadeath.util.TextUtils;
 import tech.layon.permadeath.end.demon.DemonPhase;
+import tech.layon.permadeath.util.TextUtils;
 
 import java.util.ArrayList;
 import java.util.SplittableRandom;
 
-public class PaperListeners implements Listener {
+/**
+ * Integraciones especificas de Paper.
+ *
+ * Esta clase solo debe registrarse cuando ServerPlatform detecta Paper. Los
+ * servidores Spigot usan SpigotCompatibilityListener como fallback.
+ */
+public final class PaperListeners implements Listener {
 
-    private Main main;
-    private SplittableRandom random = new SplittableRandom();
+    private final Main main;
+    private final SplittableRandom random = new SplittableRandom();
 
     public PaperListeners(Main main) {
         this.main = main;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onProjectileHit(EnderDragonFireballHitEvent e) {
-        AreaEffectCloud a = e.getAreaEffectCloud();
-        if (main.getTask() != null) {
+        AreaEffectCloud cloud = e.getAreaEffectCloud();
+        if (cloud == null || main.getTask() == null || main.endWorld == null) return;
 
-            ArrayList<Block> toChange = new ArrayList<>();
+        ArrayList<Block> toChange = new ArrayList<>();
 
-            Block b = main.endWorld.getHighestBlockAt(a.getLocation());
-            Location highest = main.endWorld.getHighestBlockAt(a.getLocation()).getLocation();
+        Block base = main.endWorld.getHighestBlockAt(cloud.getLocation());
+        Location highest = main.endWorld.getHighestBlockAt(cloud.getLocation()).getLocation();
 
-            int structure = random.nextInt(4);
-            if (structure == 0) {
-                toChange.add(b.getRelative(BlockFace.NORTH));
-                toChange.add(b.getRelative(BlockFace.NORTH).getRelative(BlockFace.WEST));
-                toChange.add(b.getRelative(BlockFace.SOUTH));
-                toChange.add(b.getRelative(BlockFace.SOUTH_EAST));
-                toChange.add(b.getRelative(BlockFace.SOUTH_WEST));
-                toChange.add(b.getRelative(BlockFace.SOUTH_EAST).getRelative(BlockFace.SOUTH));
-                toChange.add(b.getRelative(BlockFace.SOUTH_EAST).getRelative(BlockFace.NORTH));
-                toChange.add(b.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH));
-            } else if (structure == 1) {
+        int structure = random.nextInt(5);
+        if (structure == 0) {
+            toChange.add(base.getRelative(BlockFace.NORTH));
+            toChange.add(base.getRelative(BlockFace.NORTH).getRelative(BlockFace.WEST));
+            toChange.add(base.getRelative(BlockFace.SOUTH));
+            toChange.add(base.getRelative(BlockFace.SOUTH_EAST));
+            toChange.add(base.getRelative(BlockFace.SOUTH_WEST));
+            toChange.add(base.getRelative(BlockFace.SOUTH_EAST).getRelative(BlockFace.SOUTH));
+            toChange.add(base.getRelative(BlockFace.SOUTH_EAST).getRelative(BlockFace.NORTH));
+            toChange.add(base.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH));
+        } else if (structure == 1) {
+            toChange.add(base.getRelative(BlockFace.NORTH));
+            toChange.add(base.getRelative(BlockFace.NORTH_EAST));
+            toChange.add(base);
+        } else if (structure == 2) {
+            toChange.add(base.getRelative(BlockFace.SOUTH));
+            toChange.add(base.getRelative(BlockFace.SOUTH_WEST));
+            toChange.add(base);
+        } else if (structure == 3) {
+            toChange.add(base.getRelative(BlockFace.NORTH));
+            toChange.add(base.getRelative(BlockFace.NORTH_EAST));
+            toChange.add(base);
+            toChange.add(base.getRelative(BlockFace.SOUTH));
+            toChange.add(base.getRelative(BlockFace.EAST));
+        } else {
+            toChange.add(base.getRelative(BlockFace.SOUTH));
+            toChange.add(base.getRelative(BlockFace.NORTH_WEST));
+            toChange.add(base);
+            toChange.add(base.getRelative(BlockFace.NORTH));
+            toChange.add(base.getRelative(BlockFace.WEST));
+        }
 
-                toChange.add(b.getRelative(BlockFace.NORTH));
-                toChange.add(b.getRelative(BlockFace.NORTH_EAST));
-                toChange.add(b);
-            } else if (structure == 2) {
+        if (main.getTask().getCurrentDemonPhase() == DemonPhase.NORMAL) {
+            placeBedrockPattern(toChange, highest);
+            return;
+        }
 
-                toChange.add(b.getRelative(BlockFace.SOUTH));
-                toChange.add(b.getRelative(BlockFace.SOUTH_WEST));
-                toChange.add(b);
-            } else if (structure == 3) {
+        if (random.nextBoolean()) {
+            cloud.setParticle(Particle.SMOKE);
+            cloud.addCustomEffect(
+                    new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20, 1),
+                    false
+            );
+        } else {
+            placeBedrockPattern(toChange, highest);
+        }
+    }
 
-                toChange.add(b.getRelative(BlockFace.NORTH));
-                toChange.add(b.getRelative(BlockFace.NORTH_EAST));
-                toChange.add(b);
-                toChange.add(b.getRelative(BlockFace.SOUTH));
-                toChange.add(b.getRelative(BlockFace.EAST));
-            } else if (structure == 4) {
+    private void placeBedrockPattern(ArrayList<Block> blocks, Location highest) {
+        if (highest.getY() <= main.endWorld.getMinHeight()) return;
 
-                toChange.add(b.getRelative(BlockFace.SOUTH));
-                toChange.add(b.getRelative(BlockFace.NORTH_WEST));
-                toChange.add(b);
-                toChange.add(b.getRelative(BlockFace.NORTH));
-                toChange.add(b.getRelative(BlockFace.WEST));
-            }
+        for (Block block : blocks) {
+            Location column = new Location(
+                    main.endWorld,
+                    block.getX(),
+                    block.getY(),
+                    block.getZ()
+            );
 
-            if (main.getTask().getCurrentDemonPhase() == DemonPhase.NORMAL) {
-                if (highest.getY() > 0) {
+            Location used = main.endWorld.getHighestBlockAt(column).getLocation();
+            Block target = main.endWorld.getBlockAt(used);
 
-                    for (Block all : toChange) {
-                        Location used = main.endWorld.getHighestBlockAt(new Location(main.endWorld, all.getX(), all.getY(), all.getZ())).getLocation();
-                        Block now = main.endWorld.getBlockAt(used);
-                        if (now.getType() != Material.AIR) {
-                            now.setType(Material.BEDROCK);
-                        }
-                    }
-                }
-            } else {
-
-                if (random.nextBoolean()) {
-                    a.setParticle(Particle.SMOKE);
-                    a.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 20, 1), false);
-                } else {
-                    if (highest.getY() > 0) {
-                        for (Block all : toChange) {
-                            Location used = main.endWorld.getHighestBlockAt(new Location(main.endWorld, all.getX(), all.getY(), all.getZ())).getLocation();
-                            Block now = main.endWorld.getBlockAt(used);
-                            if (now.getType() != Material.AIR) {
-                                now.setType(Material.BEDROCK);
-                            }
-                        }
-                    }
-                }
+            if (target.getType() != Material.AIR) {
+                target.setType(Material.BEDROCK);
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGatewayTeleport(EntityTeleportEndGatewayEvent e) {
-
         if (main.getDay() < 40) return;
+        if (!beginningReady()) return;
 
         if (main.getDay() >= 50) {
             if (main.getBeginningManager().isClosed()) {
@@ -121,108 +133,112 @@ public class PaperListeners implements Listener {
             }
 
             Entity entity = e.getEntity();
+            if (entity instanceof Player) return;
+
             Location from = e.getFrom();
             World world = from.getWorld();
+            World beginningWorld = main.getBeginningManager().getBeginningWorld();
 
-            if (entity instanceof Player) return;
             e.setCancelled(true);
 
-            final Vector direction = entity.getLocation().getDirection();
-            final Vector velocity = entity.getVelocity();
-            Float pitch = entity.getLocation().getPitch();
-            Float yaw = entity.getLocation().getYaw();
+            final Vector direction = entity.getLocation().getDirection().clone();
+            final Vector velocity = entity.getVelocity().clone();
+            final float pitch = entity.getLocation().getPitch();
+            final float yaw = entity.getLocation().getYaw();
 
-            if (world.getName().equalsIgnoreCase(main.world.getName())) {
+            if (world.equals(main.world)) {
+                Location destination = main.getBeData().getBeginningPortal();
+                if (destination == null) return;
 
-                Location loc = main.getBeData().getBeginningPortal();
-                loc.setDirection(direction);
-                loc.setPitch(pitch);
-                loc.setYaw(yaw);
-                entity.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                entity.setVelocity(velocity);
+                Location target = destination.clone();
+                target.setDirection(direction);
+                target.setPitch(pitch);
+                target.setYaw(yaw);
+
+                Bukkit.getScheduler().runTask(main, () -> {
+                    entity.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    entity.setVelocity(velocity);
+                });
+                return;
             }
 
-            if (world.getName().equalsIgnoreCase("pdc_the_beginning")) {
+            if (world.equals(beginningWorld)) {
+                Location target = main.world.getSpawnLocation().clone();
+                target.setDirection(direction);
+                target.setPitch(pitch);
+                target.setYaw(yaw);
 
-                Bukkit.getScheduler().runTaskLater(main, new Runnable() {
-                    @Override
-                    public void run() {
-                        Location loc = main.world.getSpawnLocation();
-                        loc.setDirection(direction);
-                        loc.setPitch(pitch);
-                        loc.setYaw(yaw);
-                        entity.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        entity.setVelocity(velocity);
-                    }
-                }, 1L);
+                Bukkit.getScheduler().runTask(main, () -> {
+                    entity.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    entity.setVelocity(velocity);
+                });
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGatewayTeleport(PlayerTeleportEndGatewayEvent e) {
-
         if (main.getDay() < 40) return;
+        if (!beginningReady()) return;
+
+        Player player = e.getPlayer();
+        World fromWorld = e.getFrom().getWorld();
+        World beginningWorld = main.getBeginningManager().getBeginningWorld();
 
         if (main.getDay() < 50) {
-            if (e.getPlayer().getWorld().getName().equalsIgnoreCase(main.world.getName()) || e.getPlayer().getWorld().getName().equalsIgnoreCase(main.getBeginningManager().getBeginningWorld().getName())) {
-                e.getPlayer().setNoDamageTicks(e.getPlayer().getMaximumNoDamageTicks());
-                e.getPlayer().damage(e.getPlayer().getHealth() + 1.0D);
-                e.getPlayer().setNoDamageTicks(0);
-                Bukkit.broadcastMessage(TextUtils.format("&c&lEl jugador &4&l" + e.getPlayer().getName() + " &c&lentró a TheBeginning antes de tiempo."));
+            if (fromWorld.equals(main.world) || fromWorld.equals(beginningWorld)) {
+                player.setNoDamageTicks(player.getMaximumNoDamageTicks());
+                player.damage(player.getHealth() + 1.0D);
+                player.setNoDamageTicks(0);
+
+                Bukkit.broadcastMessage(TextUtils.format(
+                        "&c&lEl jugador &4&l" + player.getName()
+                                + " &c&lentro a TheBeginning antes de tiempo."
+                ));
             }
             return;
         }
 
-        if (main.getDay() >= 50) {
-
-            if (main.getBeginningManager().isClosed()) {
-
-                e.setCancelled(true);
-                return;
-            }
-
-            EndGateway gateway = e.getGateway();
-            Player p = e.getPlayer();
-
-            Location from = e.getFrom();
-
-            World world = from.getWorld();
-
-            gateway.setExitLocation(gateway.getLocation());
-            gateway.update();
+        if (main.getBeginningManager().isClosed()) {
             e.setCancelled(true);
+            return;
+        }
 
-            final Vector direction = p.getLocation().getDirection();
-            final Vector velocity = p.getVelocity();
+        EndGateway gateway = e.getGateway();
+        gateway.setExitLocation(gateway.getLocation());
+        gateway.update();
+        e.setCancelled(true);
 
-            if (world.getName().equalsIgnoreCase(main.world.getName())) {
+        final Vector direction = player.getLocation().getDirection().clone();
+        final Vector velocity = player.getVelocity().clone();
 
-                Bukkit.getScheduler().runTaskLater(main, new Runnable() {
-                    @Override
-                    public void run() {
+        if (fromWorld.equals(main.world)) {
+            Bukkit.getScheduler().runTask(main, () -> {
+                Location destination = main.getBeData().getBeginningPortal();
+                if (destination == null) return;
 
-                        Location loc = main.getBeData().getBeginningPortal();
-                        loc.setDirection(direction);
-                        p.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        p.setVelocity(velocity);
-                    }
-                }, 1L);
-            }
+                Location target = destination.clone();
+                target.setDirection(direction);
+                player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                player.setVelocity(velocity);
+            });
+            return;
+        }
 
-            if (world.getName().equalsIgnoreCase("pdc_the_beginning")) {
-
-                Bukkit.getScheduler().runTaskLater(main, new Runnable() {
-                    @Override
-                    public void run() {
-                        Location loc = main.world.getSpawnLocation();
-                        loc.setDirection(direction);
-                        p.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        p.setVelocity(velocity);
-                    }
-                }, 1L);
-            }
+        if (fromWorld.equals(beginningWorld)) {
+            Bukkit.getScheduler().runTask(main, () -> {
+                Location target = main.world.getSpawnLocation().clone();
+                target.setDirection(direction);
+                player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                player.setVelocity(velocity);
+            });
         }
     }
-}
 
+    private boolean beginningReady() {
+        return main.world != null
+                && main.getBeginningManager() != null
+                && main.getBeginningManager().getBeginningWorld() != null
+                && main.getBeData() != null;
+    }
+}
