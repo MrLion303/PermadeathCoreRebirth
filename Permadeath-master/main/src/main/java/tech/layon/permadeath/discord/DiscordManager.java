@@ -16,7 +16,8 @@ import org.bukkit.entity.Player;
 import tech.layon.permadeath.Main;
 import tech.layon.permadeath.data.PlayerDataManager;
 import tech.layon.permadeath.util.log.PDCLog;
-import java.awt.*;
+
+import java.awt.Color;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -36,145 +37,217 @@ public class DiscordManager {
 
     public DiscordManager() {
         this.instance = Main.getInstance();
-
         this.file = new File(instance.getDataFolder(), "discord.yml");
-        this.configuration = YamlConfiguration.loadConfiguration(this.file);
 
+        // El archivo debe existir antes de cargarlo. Así el bot funciona desde
+        // PermadeathCoreRebirth sin depender de JDA-Spigot u otro plugin externo.
         if (!file.exists()) {
             this.instance.saveResource("discord.yml", false);
         }
 
-        if (configuration.getBoolean("Enable")) {
-            log("Intentando cargar la aplicación de Discord.");
+        this.configuration = YamlConfiguration.loadConfiguration(this.file);
 
-            String token = configuration.getString("Token");
-
-            if (token.isEmpty()) {
-                log("No se ha proporcionado un token por el usuario");
-                return;
-            }
-
-            try {
-                JDABuilder builder = JDABuilder.createDefault(token);
-                builder.setActivity(Activity.watching(Objects.requireNonNull(configuration.getString("Status"))));
-
-                this.bot = builder.build();
-                this.bot.awaitReady();
-            } catch (InterruptedException e) {
-                log("Ha ocurrido un error al iniciar sesión con la aplicación de Discord, revisa tu token.");
-                e.printStackTrace();
-            }
-
-            try {
-                String s = configuration.getString("Channels.Anuncios");
-                if (s == null) return;
-                TextChannel channel = bot.getTextChannelById(s);
-                if (channel == null) return;
-                sendEmbed(channel, buildEmbed("Permadeath", Color.GREEN, null, null, null, ":gear: Plugin encendido."));
-            } catch (Exception ignored) {
-            }
-        } else {
+        if (!configuration.getBoolean("Enable")) {
             log("El bot de discord no está activado en la config");
+            return;
+        }
+
+        log("Intentando cargar la aplicación de Discord integrada.");
+
+        String token = configuration.getString("Token", "").trim();
+        if (token.isEmpty()) {
+            log("No se ha proporcionado un token por el usuario");
+            return;
+        }
+
+        try {
+            JDABuilder builder = JDABuilder.createDefault(token);
+            builder.setActivity(Activity.watching(
+                    Objects.requireNonNullElse(configuration.getString("Status"), "¡Permadeath!")));
+
+            this.bot = builder.build();
+            this.bot.awaitReady();
+
+            String channelId = configuration.getString("Channels.Anuncios");
+            if (channelId != null && !channelId.isBlank()) {
+                TextChannel channel = bot.getTextChannelById(channelId);
+                if (channel != null) {
+                    sendEmbed(channel, buildEmbed(
+                            "Permadeath",
+                            Color.GREEN,
+                            null,
+                            null,
+                            null,
+                            ":gear: Plugin encendido."));
+                }
+            }
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            log("Se interrumpió el inicio de sesión con la aplicación de Discord.");
+            this.bot = null;
+        } catch (Exception ex) {
+            log("Ha ocurrido un error al iniciar sesión con la aplicación de Discord, revisa tu token.");
+            ex.printStackTrace();
+            this.bot = null;
         }
     }
 
     public static DiscordManager getInstance() {
-        if (discordManager == null) discordManager = new DiscordManager();
-
+        if (discordManager == null) {
+            discordManager = new DiscordManager();
+        }
         return discordManager;
     }
 
     public void onDisable() {
         if (this.bot == null) return;
-        String s = configuration.getString("Channels.Anuncios");
-        if (s == null) return;
-        TextChannel channel = bot.getTextChannelById(s);
 
-        if (channel == null) return;
-        sendEmbed(channel, buildEmbed("Permadeath", Color.RED, null, null, null, ":gear: Plugin desactivado."));
+        try {
+            String channelId = configuration.getString("Channels.Anuncios");
+            if (channelId != null && !channelId.isBlank()) {
+                TextChannel channel = bot.getTextChannelById(channelId);
+                if (channel != null) {
+                    sendEmbed(channel, buildEmbed(
+                            "Permadeath",
+                            Color.RED,
+                            null,
+                            null,
+                            null,
+                            ":gear: Plugin desactivado."));
+                }
+            }
+        } finally {
+            // Ahora que JDA pertenece al propio plugin, también administramos
+            // su cierre para no dejar hilos de Discord vivos al apagar el servidor.
+            bot.shutdown();
+            bot = null;
+        }
     }
 
     public void onDeathTrain(String msg) {
         if (this.bot == null) return;
-        String s = configuration.getString("Channels.Anuncios");
-        if (s == null) return;
-        TextChannel channel = bot.getTextChannelById(s);
 
+        String channelId = configuration.getString("Channels.Anuncios");
+        if (channelId == null || channelId.isBlank()) return;
+
+        TextChannel channel = bot.getTextChannelById(channelId);
         if (channel == null) return;
-        sendEmbed(channel, buildEmbed("Permadeath", Color.RED, null, null, null, ":fire: " + ChatColor.stripColor(msg)));
+
+        sendEmbed(channel, buildEmbed(
+                "Permadeath",
+                Color.RED,
+                null,
+                null,
+                null,
+                ":fire: " + ChatColor.stripColor(msg)));
     }
 
     public void onDayChange() {
         if (this.bot == null) return;
-        String s = configuration.getString("Channels.Anuncios");
-        if (s == null) return;
-        TextChannel channel = bot.getTextChannelById(s);
 
+        String channelId = configuration.getString("Channels.Anuncios");
+        if (channelId == null || channelId.isBlank()) return;
+
+        TextChannel channel = bot.getTextChannelById(channelId);
         if (channel == null) return;
-        sendEmbed(channel, buildEmbed("Permadeath", Color.GREEN, null, null, null, ":alarm_clock: Han avanzado al día " + instance.getDay()));
+
+        sendEmbed(channel, buildEmbed(
+                "Permadeath",
+                Color.GREEN,
+                null,
+                null,
+                null,
+                ":alarm_clock: Han avanzado al día " + instance.getDay()));
     }
 
     public void banPlayer(OfflinePlayer off, boolean isAFKBan) {
-        if (this.bot == null) return;
+        if (this.bot == null || off == null) return;
 
-        Player p = (off.isOnline() ? (Player) off : null);
-
+        Player onlinePlayer = off.getPlayer();
         PlayerDataManager data = new PlayerDataManager(off.getName(), instance);
-        String playerLoc = (isAFKBan ? "" : p.getLocation().getBlockX() + " " + p.getLocation().getBlockY() + " " + p.getLocation().getBlockZ());
 
-        String serverName = configuration.getString("ServerName");
-        LocalDate n = LocalDate.now();
-        String date = String.format("%02d/%02d/%02d", n.getDayOfMonth(), n.getMonthValue(), n.getYear());
+        String playerLoc = "";
+        if (!isAFKBan && onlinePlayer != null) {
+            playerLoc = onlinePlayer.getLocation().getBlockX()
+                    + " " + onlinePlayer.getLocation().getBlockY()
+                    + " " + onlinePlayer.getLocation().getBlockZ();
+        }
+
+        String serverName = configuration.getString("ServerName", "Mi Permadeath");
+        LocalDate now = LocalDate.now();
+        String date = String.format("%02d/%02d/%02d",
+                now.getDayOfMonth(),
+                now.getMonthValue(),
+                now.getYear());
         String cause = isAFKBan ? "AFK" : data.getBanCause();
 
-        EmbedBuilder b = buildEmbed(off.getName() + " ha sido PERMABANEADO en " + serverName + "\n",
+        EmbedBuilder embed = buildEmbed(
+                off.getName() + " ha sido PERMABANEADO en " + serverName + "\n",
                 new Color(0xF40C0C),
                 null,
                 null,
                 "https://mineskin.eu/headhelm/" + off.getName() + "/100.png");
-        b.setAuthor("Permadeath", "https://twitter.com/layon", "https://www.spigotmc.org/data/avatars/l/429/429856.jpg?1692799382");
-        b.addField("\uD83D\uDCC5 Fecha", date, true);
-        b.addField("\uD83D\uDC80 Razón", cause, true);
-        if (!isAFKBan) b.addField("\uD83E\uDDED Coordenadas", playerLoc, true);
 
-        TextChannel channel = getBot().getTextChannelById(configuration.getString("Channels.DeathChannel"));
+        embed.setAuthor(
+                "Permadeath",
+                "https://twitter.com/layon",
+                "https://www.spigotmc.org/data/avatars/l/429/429856.jpg?1692799382");
+        embed.addField("📅 Fecha", date, true);
+        embed.addField("💀 Razón", cause, true);
+        if (!isAFKBan && !playerLoc.isEmpty()) {
+            embed.addField("🧭 Coordenadas", playerLoc, true);
+        }
 
-        if (channel == null) log("No pudimos encontrar el canal de muertes.");
+        String channelId = configuration.getString("Channels.DeathChannel");
+        if (channelId == null || channelId.isBlank()) {
+            log("No se ha configurado el canal de muertes.");
+            return;
+        }
 
-        assert channel != null;
-        channel.sendMessageEmbeds(b.build()).queue(message -> {
-            message.addReaction(Emoji.fromFormatted("☠")).queue();
-        });
+        TextChannel channel = bot.getTextChannelById(channelId);
+        if (channel == null) {
+            log("No pudimos encontrar el canal de muertes.");
+            return;
+        }
+
+        channel.sendMessageEmbeds(embed.build()).queue(message ->
+                message.addReaction(Emoji.fromFormatted("☠")).queue());
 
         log("Enviando mensaje de muerte a discord");
     }
 
-    private void log(String s) {
-        PDCLog.getInstance().log("[DISCORD] " + s);
+    private void log(String message) {
+        PDCLog.getInstance().log("[DISCORD] " + message);
     }
 
-    private EmbedBuilder buildEmbed(String title, Color color, String footer, String image, String thumbnail, String... description) {
-        EmbedBuilder eb = new EmbedBuilder();
+    private EmbedBuilder buildEmbed(
+            String title,
+            Color color,
+            String footer,
+            String image,
+            String thumbnail,
+            String... description) {
 
-        if (title != null) eb.setTitle(title);
-        if (color != null) eb.setColor(color);
-        if (footer != null) eb.setFooter(footer);
-        if (image != null) eb.setImage(image);
-        if (thumbnail != null) eb.setThumbnail(thumbnail);
+        EmbedBuilder embed = new EmbedBuilder();
 
-        for (String s : description) {
-            eb.addField("", s, false);
+        if (title != null) embed.setTitle(title);
+        if (color != null) embed.setColor(color);
+        if (footer != null) embed.setFooter(footer);
+        if (image != null) embed.setImage(image);
+        if (thumbnail != null) embed.setThumbnail(thumbnail);
+
+        for (String line : description) {
+            embed.addField("", line, false);
         }
 
-        return eb;
+        return embed;
     }
 
-    private void sendEmbed(MessageChannel channel, EmbedBuilder b, String... reaction) {
-        channel.sendMessageEmbeds(b.build()).queue(message -> {
-            for (String s : reaction) {
-                message.addReaction(Emoji.fromFormatted(s)).queue();
+    private void sendEmbed(MessageChannel channel, EmbedBuilder embed, String... reactions) {
+        channel.sendMessageEmbeds(embed.build()).queue(message -> {
+            for (String reaction : reactions) {
+                message.addReaction(Emoji.fromFormatted(reaction)).queue();
             }
         });
     }
 }
-
