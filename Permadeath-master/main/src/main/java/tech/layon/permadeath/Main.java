@@ -764,39 +764,19 @@ public final class Main extends JavaPlugin implements Listener {
 
     protected String setupWorld() {
 
-        if (Bukkit.getWorld(instance.getConfig().getString("Worlds.MainWorld", "world")) == null) {
+        String configuredMain = instance.getConfig().getString("Worlds.MainWorld", "world");
+        String configuredEnd = instance.getConfig().getString("Worlds.EndWorld", "world_the_end");
 
-            for (World w : Bukkit.getWorlds()) {
-                if (w.getEnvironment() == World.Environment.NORMAL) {
-                    this.world = w;
-                    break;
-                }
-            }
-
-            PDCLog.getInstance().log("[ERROR] Error al cargar el mundo principal, esto hará que los Death Train no se presenten.", true);
-            PDCLog.getInstance().log("[ERROR] Abre el archivo config.yml y establece el mundo principal en la opción: MainWorld", true);
-            PDCLog.getInstance().log("[INFO] El plugin utilizará el mundo " + (world != null ? world.getName() : "NINGUNO") + " como mundo principal.", true);
-            PDCLog.getInstance().log("[INFO] Si deseas utilizar otro mundo, configura en el archivo config.yml.", true);
-
-        } else {
-            world = Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.MainWorld")));
+        this.world = Bukkit.getWorld(configuredMain);
+        if (this.world == null) {
+            PDCLog.getInstance().log("[ERROR] No se encontró el mundo principal configurado: " + configuredMain, true);
+            PDCLog.getInstance().log("[ERROR] No se usará otro mundo automáticamente para evitar operar sobre un mundo equivocado.", true);
         }
 
-        if (Bukkit.getWorld(instance.getConfig().getString("Worlds.EndWorld", "world_the_end")) == null) {
-
-            PDCLog.getInstance().log("[ERROR] Error al cargar el mundo del end, esto hará que el end no funcione como debe.", true);
-            PDCLog.getInstance().log("[ERROR] Abre el archivo config.yml y establece el mundo del end en la opción: EndWorld", true);
-
-            for (World w : Bukkit.getWorlds()) {
-                if (w.getEnvironment() == World.Environment.THE_END) {
-                    this.endWorld = w;
-                    PDCLog.getInstance().log("[INFO] El plugin utilizará el mundo " + w.getName() + " como mundo del End.", true);
-                    break;
-                }
-            }
-
-        } else {
-            endWorld = Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.EndWorld")));
+        this.endWorld = Bukkit.getWorld(configuredEnd);
+        if (this.endWorld == null) {
+            PDCLog.getInstance().log("[ERROR] No se encontró el mundo del End configurado: " + configuredEnd, true);
+            PDCLog.getInstance().log("[ERROR] No se usará otro mundo automáticamente para evitar operar sobre un End equivocado.", true);
         }
 
         if (this.world == null) {
