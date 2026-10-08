@@ -755,7 +755,7 @@ public class SpawnListener implements Listener {
 
             if (entity.hasPotionEffect(type)) {
                 i--;
-                return;
+                continue;
             }
 
             entity.addPotionEffect(new PotionEffect(type, Integer.MAX_VALUE, lvl));
