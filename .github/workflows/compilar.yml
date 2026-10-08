@@ -2,81 +2,88 @@ name: Compilar PermadeathCoreRebirth
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  analizar-y-compilar:
+  compilar:
+    name: Detectar y compilar
     runs-on: ubuntu-latest
-
     steps:
-      - name: Descargar repositorio
-        uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Mostrar estructura del proyecto
+      - name: Mostrar estructura
         shell: bash
         run: |
-          echo "=== ESTRUCTURA ==="
-          find . -maxdepth 4 -type f | sort
-          echo
-          echo "=== ARCHIVOS DE CONSTRUCCIÓN ==="
-          find . -maxdepth 4 \( -name "build.gradle*" -o -name "settings.gradle*" -o -name "gradle.properties" -o -name "gradlew*" -o -name "pom.xml" \) -print
-          echo
-          echo "=== ARCHIVOS DE MOD ==="
-          find . -maxdepth 6 \( -name "mods.toml" -o -name "fabric.mod.json" -o -name "neoforge.mods.toml" \) -print
+          set -euxo pipefail
+          echo "=== ROOT ==="
+          ls -la
+          echo "=== FILES ==="
+          find . -maxdepth 5 -type f -not -path './.git/*' | sort
+          echo "=== BUILD FILES ==="
+          find . -type f -not -path './.git/*' \(
+            -name 'build.gradle' -o -name 'build.gradle.kts' -o
+            -name 'settings.gradle' -o -name 'settings.gradle.kts' -o
+            -name 'gradle.properties' -o -name 'gradlew' -o
+            -name 'gradlew.bat' -o -name 'pom.xml'
+          \) -print
 
-      - name: Configurar Java
+      - name: Detectar Java requerido
+        shell: bash
+        run: |
+          if grep -RqsE 'JavaLanguageVersion|java.toolchain|sourceCompatibility|targetCompatibility'             --include='*.gradle' --include='*.gradle.kts' . 2>/dev/null; then
+            echo "Configuración Java encontrada en Gradle."
+          fi
+
+      - name: Configurar Java 17
         uses: actions/setup-java@v4
         with:
-          java-version: "17"
-          distribution: "temurin"
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
 
       - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3
-        with:
-          cache-read-only: false
+        uses: gradle/actions/setup-gradle@v4
 
-      - name: Preparar Gradle Wrapper
+      - name: Compilar con Gradle Wrapper
+        if: hashFiles('gradlew') != ''
         shell: bash
         run: |
-          if [ -f "./gradlew" ]; then
-            chmod +x ./gradlew
-            echo "Gradle Wrapper encontrado."
-          elif [ -f "./gradlew.bat" ]; then
-            echo "Se encontró gradlew.bat, pero falta el wrapper Unix gradlew."
-            exit 1
-          elif [ -f "./build.gradle" ] || [ -f "./build.gradle.kts" ]; then
-            echo "No hay Gradle Wrapper. Se usará Gradle instalado por la acción."
-            echo "GRADLE_VERSION=8.10.2" >> "$GITHUB_ENV"
-          else
-            echo "No se encontró build.gradle, build.gradle.kts ni Gradle Wrapper."
-            echo "El proyecto no tiene una configuración de compilación Gradle reconocible."
-            exit 1
-          fi
+          chmod +x gradlew
+          ./gradlew build --stacktrace --no-daemon
 
-      - name: Compilar
+      - name: Compilar con Gradle instalado
+        if: hashFiles('gradlew') == '' && (hashFiles('build.gradle') != '' || hashFiles('build.gradle.kts') != '')
         shell: bash
         run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew build --stacktrace --no-daemon
-          else
-            gradle build --stacktrace --no-daemon
-          fi
+          gradle build --stacktrace --no-daemon
 
-      - name: Mostrar JAR generados
+      - name: Fallar si no hay proyecto Gradle
+        if: hashFiles('gradlew') == '' && hashFiles('build.gradle') == '' && hashFiles('build.gradle.kts') == ''
+        shell: bash
+        run: |
+          echo "::error::No se encontró Gradle Wrapper ni build.gradle/build.gradle.kts."
+          exit 1
+
+      - name: Mostrar JAR
         if: always()
         shell: bash
         run: |
           echo "=== JAR GENERADOS ==="
-          find . -type f -path "*/build/libs/*.jar" -print || true
+          find . -type f -path '*/build/libs/*.jar' -print || true
 
-      - name: Publicar JAR
+      - name: Subir JAR
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: PermadeathCoreRebirth
-          path: "**/build/libs/*.jar"
+          path: '**/build/libs/*.jar'
           if-no-files-found: error
