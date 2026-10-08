@@ -1,13 +1,10 @@
 package tech.layon.permadeath.event;
 
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import tech.layon.permadeath.Main;
 import tech.layon.permadeath.util.Utils;
 import tech.layon.permadeath.util.VersionManager;
@@ -17,22 +14,6 @@ public class HostileEntityListener implements Listener {
 
     public HostileEntityListener(Main instance) {
         this.instance = instance;
-        initialize();
-    }
-
-    public void initialize() {
-        if (instance.getDay() >= 20) {
-            EntityType type;
-            for (World w : Bukkit.getWorlds()) {
-                for (LivingEntity entity : w.getLivingEntities()) {
-                    type = entity.getType();
-
-                    if (!Utils.isHostileMob(type) && type != EntityType.ENDERMAN) {
-                        injectHostileBehavior(entity);
-                    }
-                }
-            }
-        }
     }
 
     @EventHandler
@@ -51,22 +32,7 @@ public class HostileEntityListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onChunkLoad(ChunkLoadEvent e) {
-        if (instance.getDay() < 20 || e.isNewChunk()) return;
-
-        for (Entity entity : e.getChunk().getEntities()) {
-            if (!entity.isValid() || entity.isDead()) continue;
-            if (!(entity instanceof LivingEntity) || entity instanceof Player) continue;
-
-            if (entity instanceof Villager && instance.getDay() >= 60) {
-                entity.getWorld().spawn(entity.getLocation(), Vindicator.class);
-                entity.remove();
-                continue;
-            }
-
-            injectHostileBehavior((LivingEntity) entity);
-        }
-    }
+    // Los mobs existentes no se reprocesan al cargar chunks.
+    // Solo CreatureSpawnEvent aplica la dificultad al mob recién creado.
 }
 
