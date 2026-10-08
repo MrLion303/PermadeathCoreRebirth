@@ -220,6 +220,9 @@ public final class Main extends JavaPlugin implements Listener {
                 long currentGlobalMobDay = getDay();
                 if (lastGlobalMobDay != currentGlobalMobDay) {
                     applyGlobalMobChanges();
+                    if (currentGlobalMobDay < 50) {
+                        enforceBeginningAccess();
+                    }
                     lastGlobalMobDay = currentGlobalMobDay;
                 }
 
