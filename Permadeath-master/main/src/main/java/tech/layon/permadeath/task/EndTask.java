@@ -71,6 +71,15 @@ public class EndTask extends BukkitRunnable {
     }
 
     @Override
+    public void cancel() throws IllegalStateException {
+        if (currentMovesTask != null) {
+            currentMovesTask.cancel();
+            currentMovesTask = null;
+        }
+        super.cancel();
+    }
+
+    @Override
     public void run() {
         if (isDied || enderDragon.isDead()) {
             main.setTask(null);
