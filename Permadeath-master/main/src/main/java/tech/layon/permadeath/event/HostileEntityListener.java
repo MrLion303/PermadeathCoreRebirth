@@ -62,7 +62,7 @@ public class HostileEntityListener implements Listener {
             if (entity instanceof Villager && instance.getDay() >= 60) {
                 entity.getWorld().spawn(entity.getLocation(), Vindicator.class);
                 entity.remove();
-                return;
+                continue;
             }
 
             injectHostileBehavior((LivingEntity) entity);
