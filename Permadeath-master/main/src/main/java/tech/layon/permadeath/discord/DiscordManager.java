@@ -83,10 +83,6 @@ public class DiscordManager {
                             ":gear: Plugin encendido."));
                 }
             }, 20L);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            log("Se interrumpió el inicio de sesión con la aplicación de Discord.");
-            this.bot = null;
         } catch (Exception ex) {
             log("Ha ocurrido un error al iniciar sesión con la aplicación de Discord, revisa tu token.");
             ex.printStackTrace();
