@@ -1014,6 +1014,25 @@ public final class Main extends JavaPlugin implements Listener {
         return begginingManager;
     }
 
+    public void setBeginningDataForDebug() {
+        if (this.beData == null) {
+            this.beData = new BeginningDataManager(this);
+        }
+    }
+
+    public void createBeginningForDebug() {
+        if (this.beData == null) {
+            this.beData = new BeginningDataManager(this);
+        }
+        if (this.begginingManager == null) {
+            this.begginingManager = new BeginningManager(this);
+        }
+        if (this.recipes == null) {
+            this.recipes = new RecipeManager(this);
+        }
+        this.recipes.registerRecipes();
+    }
+
     public void setTask(EndTask task) {
         this.task = task;
     }
