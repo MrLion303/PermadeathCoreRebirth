@@ -65,6 +65,8 @@ public final class DifficultyChanges implements Listener {
     private final NamespacedKey wardenLastRollKey;
     private final NamespacedKey demonBuffedKey;
     private final NamespacedKey xpBottleRecipeKey;
+    private final NamespacedKey batAttackOriginalKey;
+    private final NamespacedKey dragonHealthOriginalKey;
 
     private boolean xpBottleRecipeRegistered = false;
 
@@ -75,6 +77,8 @@ public final class DifficultyChanges implements Listener {
         this.wardenLastRollKey = new NamespacedKey(plugin, "day60_warden_last_roll");
         this.demonBuffedKey = new NamespacedKey(plugin, "day35_demon_buffed");
         this.xpBottleRecipeKey = new NamespacedKey(plugin, "day15_xp_bottles");
+        this.batAttackOriginalKey = new NamespacedKey(plugin, "difficulty_bat_attack_original");
+        this.dragonHealthOriginalKey = new NamespacedKey(plugin, "difficulty_dragon_health_original");
 
         // Daños por inventario/bloques, Darkness, agua, Elytras, Saturación y Warden de día 60.
         Bukkit.getScheduler().runTaskTimer(plugin, this::tickPlayers, 20L, 20L);
@@ -87,6 +91,11 @@ public final class DifficultyChanges implements Listener {
         registerXpBottleRecipeIfNeeded();
 
         long day = plugin.getDay();
+        if (day < 15) {
+            xpBottleRecipeRegistered = false;
+            Bukkit.removeRecipe(xpBottleRecipeKey);
+        }
+
         if (day < 25) {
             return;
         }
@@ -165,6 +174,7 @@ public final class DifficultyChanges implements Listener {
                 if (entity instanceof Player || !entity.isValid() || entity.isDead()) {
                     continue;
                 }
+                removeOutdatedChanges(entity);
                 applyMobChanges(entity);
             }
         }
@@ -177,6 +187,7 @@ public final class DifficultyChanges implements Listener {
 
     private void applyMobChanges(LivingEntity entity) {
         long day = plugin.getDay();
+        removeOutdatedChanges(entity);
 
         if (day >= 5) {
             if (entity instanceof Warden) {
@@ -242,7 +253,10 @@ public final class DifficultyChanges implements Listener {
                 AttributeInstance attackDamage = bat.getAttribute(Attribute.ATTACK_DAMAGE);
                 if (attackDamage == null) {
                     plugin.getNmsAccessor().registerAttribute(Attribute.ATTACK_DAMAGE, 20.0D, bat);
-                } else {
+                    attackDamage = bat.getAttribute(Attribute.ATTACK_DAMAGE);
+                }
+                if (attackDamage != null) {
+                    rememberAttribute(attackDamage, bat, batAttackOriginalKey);
                     attackDamage.setBaseValue(20.0D);
                 }
             }
@@ -256,6 +270,61 @@ public final class DifficultyChanges implements Listener {
 
         if (day >= 35 && entity instanceof EnderDragon dragon) {
             buffPermadeathDemon(dragon);
+        }
+    }
+
+    private void removeOutdatedChanges(LivingEntity entity) {
+        long day = plugin.getDay();
+
+        if (day < 5) {
+            removeTaggedEffect(entity, PotionEffectType.SPEED);
+            removeTaggedEffect(entity, PotionEffectType.RESISTANCE);
+            removeTaggedEffect(entity, PotionEffectType.FIRE_RESISTANCE);
+        }
+        if (day < 10) {
+            removeTaggedEffect(entity, PotionEffectType.INVISIBILITY);
+            removeTaggedEffect(entity, PotionEffectType.STRENGTH);
+        }
+        if (day < 15) {
+            restoreAttribute(entity, batAttackOriginalKey);
+        }
+        if (day < 35) {
+            restoreAttribute(entity, dragonHealthOriginalKey);
+        }
+        if (entity.getPersistentDataContainer().has(saturationGrantedKey, PersistentDataType.BYTE) && day < 45) {
+            entity.removePotionEffect(PotionEffectType.SATURATION);
+            entity.getPersistentDataContainer().remove(saturationGrantedKey);
+        }
+    }
+
+    private void removeTaggedEffect(LivingEntity entity, PotionEffectType type) {
+        String keyName = "difficulty_effect_" + type.getName().toLowerCase();
+        NamespacedKey key = new NamespacedKey(plugin, keyName);
+        if (entity.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
+            entity.removePotionEffect(type);
+            entity.getPersistentDataContainer().remove(key);
+        }
+    }
+
+    private void rememberAttribute(AttributeInstance attribute, LivingEntity entity, NamespacedKey key) {
+        if (!entity.getPersistentDataContainer().has(key, PersistentDataType.DOUBLE)) {
+            entity.getPersistentDataContainer().set(key, PersistentDataType.DOUBLE, attribute.getBaseValue());
+        }
+    }
+
+    private void restoreAttribute(LivingEntity entity, NamespacedKey key) {
+        Double original = entity.getPersistentDataContainer().get(key, PersistentDataType.DOUBLE);
+        if (original != null) {
+            Attribute attribute = key.equals(batAttackOriginalKey) ? Attribute.ATTACK_DAMAGE : Attribute.MAX_HEALTH;
+            AttributeInstance instance = entity.getAttribute(attribute);
+            if (instance != null) {
+                instance.setBaseValue(original);
+                if (attribute == Attribute.MAX_HEALTH) {
+                    entity.setHealth(Math.min(entity.getHealth(), original));
+                }
+            }
+            entity.getPersistentDataContainer().remove(key);
+            entity.getPersistentDataContainer().remove(demonBuffedKey);
         }
     }
 
@@ -276,6 +345,10 @@ public final class DifficultyChanges implements Listener {
                 false,
                 true,
                 true));
+        entity.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "difficulty_effect_" + type.getName().toLowerCase()),
+                PersistentDataType.BYTE,
+                (byte) 1);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -471,6 +544,7 @@ public final class DifficultyChanges implements Listener {
             return;
         }
 
+        rememberAttribute(maxHealth, dragon, dragonHealthOriginalKey);
         double oldMax = Math.max(1.0D, maxHealth.getBaseValue());
         double configuredHealth = plugin.getConfig().getDouble("Toggles.End.PermadeathDemon.Health");
         if (configuredHealth <= 0.0D) {
