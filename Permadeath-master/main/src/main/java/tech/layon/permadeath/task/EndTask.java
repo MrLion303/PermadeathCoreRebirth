@@ -112,10 +112,11 @@ public class EndTask extends BukkitRunnable {
                 continue;
             }
 
-            // La posición queda libre antes de crear el cristal.
+            // Nunca destruimos bloques colocados después de la explosión.
             Material blockType = loc.getBlock().getType();
-            if (blockType != Material.BEDROCK && blockType != Material.AIR) {
-                loc.getBlock().setType(Material.AIR);
+            Material belowType = loc.getBlock().getRelative(0, -1, 0).getType();
+            if (blockType != Material.AIR || (belowType != Material.BEDROCK && belowType != Material.OBSIDIAN)) {
+                continue;
             }
 
             loc.getWorld().spawnEntity(loc, EntityType.END_CRYSTAL);
@@ -374,7 +375,7 @@ public class EndTask extends BukkitRunnable {
 
     public void chooseAnAttack() {
         int ran = random.nextInt(25);
-        if (ran <= 3) {
+        if (ran < 4) {
             currentAttack = DemonCurrentAttack.LIGHTING_RAIN;
         } else if (ran >= 4 && ran <= 15) {
             currentAttack = DemonCurrentAttack.ENDERMAN_BUFF;
