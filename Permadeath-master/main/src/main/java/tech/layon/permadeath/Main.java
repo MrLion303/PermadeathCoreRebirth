@@ -210,8 +210,7 @@ public final class Main extends JavaPlugin implements Listener {
                     reloadConfig();
                     startPlugin();
 
-                    // Los mobs existentes no se reprocesan al arrancar.
-                    // La dificultad se fija únicamente cuando el mob aparece.
+                    // Las transformaciones globales se sincronizan después de iniciar; los cambios exclusivos del spawn no se reaplican.
                     loaded = true;
                 }
 
