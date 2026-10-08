@@ -80,15 +80,24 @@ public class EndManager implements Listener {
         int replaced = 0;
 
         for (int[] center : pillarCenters) {
-            int x = center[0];
-            int z = center[1];
-            for (int y = minY; y <= maxY; y++) {
-                Block block = end.getBlockAt(x, y, z);
-                if (block.getType() == Material.OBSIDIAN) {
-                    block.setType(Material.BEDROCK, false);
-                    replaced++;
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    int x = center[0] + dx;
+                    int z = center[1] + dz;
+                    for (int y = minY; y <= maxY; y++) {
+                        Block block = end.getBlockAt(x, y, z);
+                        if (block.getType() == Material.OBSIDIAN) {
+                            block.setType(Material.BEDROCK, false);
+                            replaced++;
+                        }
+                    }
                 }
             }
+        }
+
+        if (replaced == 0) {
+            main.getLogger().warning("No se encontraron bloques de obsidiana en los pilares del End; no se marcará la preparación como completada.");
+            return;
         }
 
         data.setReplacedObsidian(true);
