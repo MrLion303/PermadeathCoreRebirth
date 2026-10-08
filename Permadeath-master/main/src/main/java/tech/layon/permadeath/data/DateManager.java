@@ -148,7 +148,7 @@ public class DateManager {
             reloadFile();
         }
 
-        if (c.getString("Fecha").isEmpty()) {
+        if (c.getString("Fecha", "").trim().isEmpty()) {
 
             c.set("Fecha", getDateForDayOne());
             saveFile();
