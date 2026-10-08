@@ -9,31 +9,31 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TreePopulator extends BlockPopulator {
-    private static Set<Coordinates> chunks = ConcurrentHashMap.newKeySet();
-    private static Set<Coordinates> unpopulatedChunks = ConcurrentHashMap.newKeySet();
+    private final Set<Coordinates> chunks = ConcurrentHashMap.newKeySet();
+    private final Set<Coordinates> unpopulatedChunks = ConcurrentHashMap.newKeySet();
 
     @Override
     public void populate(World world, Random random, Chunk chunk) {
-        int chunkX = chunk.getX();
-        int chunkZ = chunk.getZ();
-        Coordinates chunkCoordinates = new Coordinates(chunkX, chunkZ);
+        Coordinates current = new Coordinates(chunk.getX(), chunk.getZ());
+        chunks.add(current);
+        unpopulatedChunks.add(current);
 
-        if (!chunks.contains(chunkCoordinates)) {
-            chunks.add(chunkCoordinates);
-            unpopulatedChunks.add(chunkCoordinates);
-        }
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                Coordinates candidate = new Coordinates(chunk.getX() + dx, chunk.getZ() + dz);
+                if (!unpopulatedChunks.contains(candidate)) continue;
 
-        for (Coordinates unpopulatedChunk : unpopulatedChunks) {
-            if (chunks.contains(unpopulatedChunk.left())
-                    && chunks.contains(unpopulatedChunk.right())
-                    && chunks.contains(unpopulatedChunk.above())
-                    && chunks.contains(unpopulatedChunk.below())
-                    && chunks.contains(unpopulatedChunk.upperLeft())
-                    && chunks.contains(unpopulatedChunk.upperRight())
-                    && chunks.contains(unpopulatedChunk.lowerLeft())
-                    && chunks.contains(unpopulatedChunk.lowerRight())) {
-                actuallyPopulate(world, random, world.getChunkAt(unpopulatedChunk.x, unpopulatedChunk.z));
-                unpopulatedChunks.remove(unpopulatedChunk);
+                if (chunks.contains(candidate.left())
+                        && chunks.contains(candidate.right())
+                        && chunks.contains(candidate.above())
+                        && chunks.contains(candidate.below())
+                        && chunks.contains(candidate.upperLeft())
+                        && chunks.contains(candidate.upperRight())
+                        && chunks.contains(candidate.lowerLeft())
+                        && chunks.contains(candidate.lowerRight())) {
+                    actuallyPopulate(world, random, world.getChunkAt(candidate.x, candidate.z));
+                    unpopulatedChunks.remove(candidate);
+                }
             }
         }
     }
@@ -48,7 +48,7 @@ public class TreePopulator extends BlockPopulator {
             --y;
         }
 
-        if (y > 0 && y < 255) {
+        if (y > world.getMinHeight() && y < world.getMaxHeight() - 1) {
 
             if (y >= 100 && y < 105) {
 
@@ -66,17 +66,17 @@ public class TreePopulator extends BlockPopulator {
                     @Override
                     public @NotNull
                     BlockData getBlockData(int i, int i1, int i2) {
-                        return null;
+                        return world.getBlockAt(i, i1, i2).getBlockData();
                     }
 
                     @Override
                     public int getHeight() {
-                        return 255;
+                        return world.getMaxHeight();
                     }
 
                     @Override
                     public boolean isEmpty(int i, int i1, int i2) {
-                        return false;
+                        return world.getBlockAt(i, i1, i2).getType().isAir();
                     }
                 });
             }
