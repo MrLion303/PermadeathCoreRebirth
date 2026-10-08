@@ -1,0 +1,82 @@
+name: Compilar PermadeathCoreRebirth
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analizar-y-compilar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Mostrar estructura del proyecto
+        shell: bash
+        run: |
+          echo "=== ESTRUCTURA ==="
+          find . -maxdepth 4 -type f | sort
+          echo
+          echo "=== ARCHIVOS DE CONSTRUCCIÓN ==="
+          find . -maxdepth 4 \( -name "build.gradle*" -o -name "settings.gradle*" -o -name "gradle.properties" -o -name "gradlew*" -o -name "pom.xml" \) -print
+          echo
+          echo "=== ARCHIVOS DE MOD ==="
+          find . -maxdepth 6 \( -name "mods.toml" -o -name "fabric.mod.json" -o -name "neoforge.mods.toml" \) -print
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3
+        with:
+          cache-read-only: false
+
+      - name: Preparar Gradle Wrapper
+        shell: bash
+        run: |
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+            echo "Gradle Wrapper encontrado."
+          elif [ -f "./gradlew.bat" ]; then
+            echo "Se encontró gradlew.bat, pero falta el wrapper Unix gradlew."
+            exit 1
+          elif [ -f "./build.gradle" ] || [ -f "./build.gradle.kts" ]; then
+            echo "No hay Gradle Wrapper. Se usará Gradle instalado por la acción."
+            echo "GRADLE_VERSION=8.10.2" >> "$GITHUB_ENV"
+          else
+            echo "No se encontró build.gradle, build.gradle.kts ni Gradle Wrapper."
+            echo "El proyecto no tiene una configuración de compilación Gradle reconocible."
+            exit 1
+          fi
+
+      - name: Compilar
+        shell: bash
+        run: |
+          if [ -f "./gradlew" ]; then
+            ./gradlew build --stacktrace --no-daemon
+          else
+            gradle build --stacktrace --no-daemon
+          fi
+
+      - name: Mostrar JAR generados
+        if: always()
+        shell: bash
+        run: |
+          echo "=== JAR GENERADOS ==="
+          find . -type f -path "*/build/libs/*.jar" -print || true
+
+      - name: Publicar JAR
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PermadeathCoreRebirth
+          path: "**/build/libs/*.jar"
+          if-no-files-found: error
