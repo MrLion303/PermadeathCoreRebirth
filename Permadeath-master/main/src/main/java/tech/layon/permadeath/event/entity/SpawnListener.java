@@ -1300,7 +1300,11 @@ public class SpawnListener implements Listener {
     }
 
     private void spawnUltraRavagerAt(Location location) {
-        Ravager ultraRavager = (Ravager) location.getWorld().spawnEntity(location, EntityType.RAVAGER);
+        Ravager ultraRavager = (Ravager) plugin.getNmsHandler().spawnNMSCustomEntity(
+                "UltraRavager",
+                EntityType.RAVAGER,
+                location,
+                CreatureSpawnEvent.SpawnReason.CUSTOM);
         ultraRavager.setCustomName(TextUtils.format("&6Ultra Ravager"));
         ultraRavager.setCustomNameVisible(true);
         ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
