@@ -20,6 +20,7 @@ import tech.layon.permadeath.Main;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Random;
@@ -49,13 +50,35 @@ public class WorldEditPortal {
                 break;
         }
 
-        ClipboardFormat format = ClipboardFormats.findByFile(file);
-
-        assert format != null;
-
-        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
-            clipboard = reader.read();
-        } catch (IOException e) {
+        try {
+            ClipboardFormat format = ClipboardFormats.findByFile(file);
+            if (format != null && file.isFile()) {
+                try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
+                    clipboard = reader.read();
+                }
+            } else {
+                int schematic = Integer.parseInt(file.getName().replace("island", "").replace(".schem", ""));
+                String resourcePath = "updated_schematics/island" + schematic + ".schem";
+                InputStream resource = Main.getInstance().getResource(resourcePath);
+                if (resource == null) {
+                    resourcePath = "original_schematics/island" + schematic + ".schem";
+                    resource = Main.getInstance().getResource(resourcePath);
+                }
+                if (resource == null) {
+                    Main.getInstance().getLogger().warning("No se encontró el schematic " + resourcePath + " para la isla del End.");
+                    return;
+                }
+                ClipboardFormat resourceFormat = ClipboardFormats.findByFile(new File("island" + schematic + ".schem"));
+                if (resourceFormat == null) {
+                    Main.getInstance().getLogger().warning("WorldEdit no reconoce el formato del schematic de la isla " + schematic + ".");
+                    resource.close();
+                    return;
+                }
+                try (InputStream stream = resource; ClipboardReader reader = resourceFormat.getReader(stream)) {
+                    clipboard = reader.read();
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
             return;
         }
