@@ -180,5 +180,9 @@ public class DateManager {
         if (dai == null) dai = new DateManager();
         return dai;
     }
+
+    public static void reset() {
+        dai = null;
+    }
 }
 
