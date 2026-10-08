@@ -580,6 +580,11 @@ public final class Main extends JavaPlugin implements Listener {
         }
 
         String worldState = setupWorld();
+        if (this.world == null || this.endWorld == null) {
+            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&cNo se pudieron resolver los mundos requeridos. El plugin será desactivado."));
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&f&m------------------------------------------"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("             &c&lPERMADEATH"));
