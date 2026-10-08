@@ -143,13 +143,13 @@ public class TotemListener implements Listener {
         boolean tieneMedalla = false;
 
         if (p.getInventory().getItemInMainHand() != null) {
-            if (p.getInventory().getItemInMainHand().getType() == Material.TOTEM_OF_UNDYING && p.getInventory().getItemInMainHand().getItemMeta().isUnbreakable()) {
+            if (isSpecial(p.getInventory().getItemInMainHand())) {
                 tieneMedalla = true;
             }
         }
 
         if (p.getInventory().getItemInOffHand() != null) {
-            if (p.getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING && p.getInventory().getItemInOffHand().getItemMeta().isUnbreakable()) {
+            if (isSpecial(p.getInventory().getItemInOffHand())) {
                 tieneMedalla = true;
             }
         }
@@ -158,7 +158,8 @@ public class TotemListener implements Listener {
     }
 
     private boolean isSpecial(ItemStack off) {
-        return off != null && off.getType() == Material.TOTEM_OF_UNDYING && off.getItemMeta().isUnbreakable();
+        return off != null && off.getType() == Material.TOTEM_OF_UNDYING
+                && off.hasItemMeta() && off.getItemMeta() != null && off.getItemMeta().isUnbreakable();
     }
 
     public enum EnumPlayerTotemSlot {
