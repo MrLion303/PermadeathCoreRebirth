@@ -878,6 +878,7 @@ public final class Main extends JavaPlugin implements Listener {
         c.set("Toggles.End.Ender-Creeper-Count", 20);
         c.set("Toggles.End.Protect-End-Spawn", false);
         c.set("Toggles.End.Protect-Radius", 10);
+        c.set("Toggles.End.Small-Islands", true);
         c.set("Toggles.End.PermadeathDemon.DisplayName", "&6&lPERMADEATH DEMON");
         c.set("Toggles.End.PermadeathDemon.DisplayNameEnraged", "&6&lENRAGED PERMADEATH DEMON");
         c.set("Toggles.End.PermadeathDemon.Health", 1350);
@@ -955,7 +956,7 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     public boolean isSmallIslandsEnabled() {
-        return true;
+        return getConfig().getBoolean("Toggles.End.Small-Islands", true);
     }
 
     public void deathTrainEffects(LivingEntity entity) {
