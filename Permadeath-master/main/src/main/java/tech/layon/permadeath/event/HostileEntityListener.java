@@ -6,15 +6,19 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataType;
 import tech.layon.permadeath.Main;
 import tech.layon.permadeath.util.Utils;
 import tech.layon.permadeath.util.VersionManager;
 
 public class HostileEntityListener implements Listener {
     private final Main instance;
+    private final NamespacedKey hostileInjectedKey;
 
     public HostileEntityListener(Main instance) {
         this.instance = instance;
+        this.hostileInjectedKey = new NamespacedKey(instance, "hostile_behavior_injected");
     }
 
     @EventHandler
@@ -27,7 +31,11 @@ public class HostileEntityListener implements Listener {
     }
 
     private void injectHostileBehavior(LivingEntity entity) {
+        if (entity.getPersistentDataContainer().has(hostileInjectedKey, PersistentDataType.BYTE)) {
+            return;
+        }
         instance.getNmsAccessor().injectHostilePathfinders(entity);
+        entity.getPersistentDataContainer().set(hostileInjectedKey, PersistentDataType.BYTE, (byte) 1);
         if (entity.getAttribute(Attribute.ATTACK_DAMAGE) == null) {
             instance.getNmsAccessor().registerAttribute(Attribute.ATTACK_DAMAGE, 8.0D, entity);
         }
