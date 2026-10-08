@@ -76,7 +76,7 @@ public class EndDataManager {
 
     public void loadSettings() {
 
-        this.timeList = (ArrayList<Integer>) config.getIntegerList("EnderCrystalRegenTime");
+        this.timeList = new ArrayList<>(config.getIntegerList("EnderCrystalRegenTime"));
     }
 
     public ArrayList<Integer> getTimeList() {
