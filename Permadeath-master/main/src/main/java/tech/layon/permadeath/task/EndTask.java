@@ -374,12 +374,12 @@ public class EndTask extends BukkitRunnable {
     }
 
     public void chooseAnAttack() {
-        int ran = random.nextInt(25);
-        if (ran < 4) {
+        int ran = random.nextInt(3);
+        if (ran == 0) {
             currentAttack = DemonCurrentAttack.LIGHTING_RAIN;
-        } else if (ran >= 4 && ran <= 15) {
+        } else if (ran == 1) {
             currentAttack = DemonCurrentAttack.ENDERMAN_BUFF;
-        } else if (ran >= 15 && ran <= 25) {
+        } else {
             currentAttack = DemonCurrentAttack.NIGHT_VISION;
         }
     }
