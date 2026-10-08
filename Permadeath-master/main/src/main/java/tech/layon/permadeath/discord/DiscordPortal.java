@@ -31,10 +31,10 @@ public final class DiscordPortal {
     }
 
     public static void onDisable() {
-        DiscordManager.getInstance().onDisable();
+        DiscordManager.shutdown();
     }
 
     public static void reload() {
-        DiscordManager.getInstance();
+        DiscordManager.reload();
     }
 }
