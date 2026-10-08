@@ -113,9 +113,14 @@ public class EndManager implements Listener {
         };
         int generated = 0;
 
-        for (int[] position : positions) {
-            int x = position[0];
-            int z = position[1];
+        for (int i = 0; i < positions.length; i++) {
+            if (data.isIslandGenerated(i)) {
+                generated++;
+                continue;
+            }
+
+            int x = positions[i][0];
+            int z = positions[i][1];
             int surfaceY = end.getHighestBlockYAt(x, z);
             if (surfaceY < 0) {
                 surfaceY = 64;
@@ -123,6 +128,7 @@ public class EndManager implements Listener {
 
             // generateIsland coloca el schematic 20 bloques sobre la altura recibida.
             if (WorldEditPortal.generateIsland(end, x, z, Math.max(0, surfaceY - 20), random)) {
+                data.setIslandGenerated(i, true);
                 generated++;
             }
         }
