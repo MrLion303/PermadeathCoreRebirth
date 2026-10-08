@@ -760,7 +760,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             PDCLog.getInstance().log("[ERROR] Error al cargar el mundo principal, esto hará que los Death Train no se presenten.", true);
             PDCLog.getInstance().log("[ERROR] Abre el archivo config.yml y establece el mundo principal en la opción: MainWorld", true);
-            PDCLog.getInstance().log("[INFO] El plugin utilizará el mundo " + world.getName() + " como mundo principal.", true);
+            PDCLog.getInstance().log("[INFO] El plugin utilizará el mundo " + (world != null ? world.getName() : "NINGUNO") + " como mundo principal.", true);
             PDCLog.getInstance().log("[INFO] Si deseas utilizar otro mundo, configura en el archivo config.yml.", true);
 
         } else {
