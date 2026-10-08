@@ -2,11 +2,9 @@ name: Compilar PermadeathCoreRebirth
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -14,76 +12,57 @@ permissions:
 
 jobs:
   compilar:
-    name: Detectar y compilar
+    name: Compilar con Maven
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Mostrar estructura
+      - name: Detectar proyecto
         shell: bash
         run: |
-          set -euxo pipefail
-          echo "=== ROOT ==="
-          ls -la
-          echo "=== FILES ==="
-          find . -maxdepth 5 -type f -not -path './.git/*' | sort
-          echo "=== BUILD FILES ==="
-          find . -type f -not -path './.git/*' \(
-            -name 'build.gradle' -o -name 'build.gradle.kts' -o
-            -name 'settings.gradle' -o -name 'settings.gradle.kts' -o
-            -name 'gradle.properties' -o -name 'gradlew' -o
-            -name 'gradlew.bat' -o -name 'pom.xml'
-          \) -print
+          set -e
+          echo "=== ESTRUCTURA DEL REPOSITORIO ==="
+          find . -maxdepth 4 -type f -not -path './.git/*' | sort
 
-      - name: Detectar Java requerido
-        shell: bash
-        run: |
-          if grep -RqsE 'JavaLanguageVersion|java.toolchain|sourceCompatibility|targetCompatibility'             --include='*.gradle' --include='*.gradle.kts' . 2>/dev/null; then
-            echo "Configuración Java encontrada en Gradle."
+          if [ ! -f "Permadeath-master/pom.xml" ]; then
+            echo "::error::No se encontró Permadeath-master/pom.xml"
+            exit 1
           fi
 
-      - name: Configurar Java 17
+          echo "Proyecto Maven detectado en Permadeath-master"
+
+      - name: Configurar Java 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
-          cache: gradle
+          java-version: '25'
+          cache: maven
+          cache-dependency-path: Permadeath-master/pom.xml
 
-      - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Compilar con Gradle Wrapper
-        if: hashFiles('gradlew') != ''
+      - name: Mostrar versiones
         shell: bash
         run: |
-          chmod +x gradlew
-          ./gradlew build --stacktrace --no-daemon
+          java -version
+          mvn -version
 
-      - name: Compilar con Gradle instalado
-        if: hashFiles('gradlew') == '' && (hashFiles('build.gradle') != '' || hashFiles('build.gradle.kts') != '')
-        shell: bash
-        run: |
-          gradle build --stacktrace --no-daemon
+      - name: Compilar proyecto
+        working-directory: Permadeath-master
+        run: mvn -B clean package --no-transfer-progress
 
-      - name: Fallar si no hay proyecto Gradle
-        if: hashFiles('gradlew') == '' && hashFiles('build.gradle') == '' && hashFiles('build.gradle.kts') == ''
-        shell: bash
-        run: |
-          echo "::error::No se encontró Gradle Wrapper ni build.gradle/build.gradle.kts."
-          exit 1
-
-      - name: Mostrar JAR
+      - name: Mostrar JAR generados
         if: always()
         shell: bash
         run: |
           echo "=== JAR GENERADOS ==="
-          find . -type f -path '*/build/libs/*.jar' -print || true
+          find Permadeath-master -type f -name '*.jar' -not -path '*/.git/*' | sort || true
 
-      - name: Subir JAR
+      - name: Subir JARs
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: PermadeathCoreRebirth
-          path: '**/build/libs/*.jar'
+          name: PermadeathCoreRebirth-JARs
+          path: |
+            Permadeath-master/**/target/*.jar
           if-no-files-found: error
