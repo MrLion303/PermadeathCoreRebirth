@@ -12,6 +12,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -637,10 +638,10 @@ public class SpawnListener implements Listener {
         }
     }
 
-    /*
-     * Las modificaciones de dificultad se aplican al crear el mob, no al cargar
-     * chunks. Esto es intencional: un mob que ya existía conserva para siempre
-     * la versión de dificultad que recibió cuando apareció.
+    /**
+     * Aplica únicamente las transformaciones de dificultad que son globales e
+     * irreversibles. Los atributos/equipamiento que solo corresponden al spawn
+     * siguen aplicándose exclusivamente en CreatureSpawnEvent.
      */
     public void applyDayChanges(LivingEntity entity) {
 
@@ -701,6 +702,18 @@ public class SpawnListener implements Listener {
                     entity.getWorld().spawn(entity.getLocation(), Vindicator.class);
                 }
                 entity.remove();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        // Las transformaciones de especie del Permadeath original también
+        // afectan a mobs que ya existían cuando se alcanzó el día.
+        if (plugin.getDay() < 30) return;
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (entity instanceof LivingEntity living) {
+                applyDayChanges(living);
             }
         }
     }
