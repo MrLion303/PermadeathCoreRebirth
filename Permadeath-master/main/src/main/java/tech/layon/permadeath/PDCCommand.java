@@ -266,7 +266,7 @@ public class PDCCommand implements CommandExecutor {
                         p.sendMessage("Actual health: " + (d < 50 ? 25 : d < 60 ? 40 : 110)); // Día 30);
                     } else if (args[1].equalsIgnoreCase("withertime")) {
 
-                        p.sendMessage("tiempo: " + p.getPersistentDataContainer().get(new NamespacedKey(instance, "wither"), PersistentDataType.INTEGER));
+                        p.sendMessage("tiempo global del Wither: " + instance.getWitherTimer() + "/2400 ciclos.");
 
                     } else if (args[1].equalsIgnoreCase("testtotems")) {
                         p.sendMessage("Totems sin offhand debug: " + p.getInventory().all(Material.TOTEM_OF_UNDYING).size());
