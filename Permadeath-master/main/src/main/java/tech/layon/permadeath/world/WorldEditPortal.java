@@ -28,11 +28,11 @@ import java.util.SplittableRandom;
 
 public class WorldEditPortal {
 
-    public static void generateIsland(World world, int x, int z, int height, SplittableRandom random) {
+    public static boolean generateIsland(World world, int x, int z, int height, SplittableRandom random) {
         Clipboard clipboard;
         File file;
 
-        switch (random.nextInt(6)) {
+        switch (random.nextInt(5)) {
             case 0:
                 file = new File(Main.getInstance().getDataFolder(), "schematics/island1.schem");
                 break;
@@ -80,7 +80,7 @@ public class WorldEditPortal {
             }
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
-            return;
+            return false;
         }
 
         try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), -1)) {
@@ -90,23 +90,36 @@ public class WorldEditPortal {
                     .ignoreAirBlocks(true)
                     .build();
             Operations.complete(operation);
+            return true;
         } catch (WorldEditException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    public static void generateYtic(World world, int x, int z, int height) {
+    public static boolean generateYtic(World world, int x, int z, int height) {
         Clipboard clipboard;
         File file = new File(Main.getInstance().getDataFolder(), "schematics/ytic.schem");
 
         ClipboardFormat format = ClipboardFormats.findByFile(file);
-
-        assert format != null;
-        try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
+        if (format == null || !file.isFile()) {
+            InputStream resource = Main.getInstance().getResource("updated_schematics/ytic.schem");
+            if (resource == null) resource = Main.getInstance().getResource("original_schematics/ytic.schem");
+            if (resource == null) {
+                Main.getInstance().getLogger().warning("No se encontró el schematic ytic.schem.");
+                return false;
+            }
+            try (InputStream stream = resource; ClipboardReader reader = ClipboardFormats.findByFile(new File("ytic.schem")).getReader(stream)) {
+                clipboard = reader.read();
+            } catch (IOException | NullPointerException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else try (ClipboardReader reader = format.getReader(new FileInputStream(file))) {
             clipboard = reader.read();
         } catch (IOException e) {
             e.printStackTrace();
-            return;
+            return false;
         }
 
         try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), -1)) {
