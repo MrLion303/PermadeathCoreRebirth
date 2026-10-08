@@ -299,7 +299,7 @@ public final class DifficultyChanges implements Listener {
             removeTaggedEffect(entity, PotionEffectType.INVISIBILITY);
         }
         if (day < 15) {
-            if (entity instanceof Frog || entity instanceof Piglin || entity instanceof Camel || entity instanceof Bat || entity instanceof Illusioner) {
+            if (entity instanceof Camel || entity instanceof Bat || entity instanceof Illusioner) {
                 removeEffect(entity, PotionEffectType.STRENGTH);
                 removeEffect(entity, PotionEffectType.SPEED);
                 removeEffect(entity, PotionEffectType.RESISTANCE);
