@@ -887,12 +887,10 @@ public final class Main extends JavaPlugin implements Listener {
         }
 
         Player player = event.getPlayer();
-        event.setCancelled(true);
-        player.setNoDamageTicks(player.getMaximumNoDamageTicks());
-        player.damage(player.getHealth() + 1.0D);
-        player.setNoDamageTicks(0);
+        Location spawn = world.getSpawnLocation().clone();
+        event.setTo(spawn);
         Bukkit.broadcastMessage(TextUtils.format("&c&lEl jugador &4&l" + player.getName()
-                + " &c&lintentó entrar a TheBeginning antes del día 50."));
+                + " &c&lintentó entrar a TheBeginning antes del día 50 y fue enviado al spawn."));
     }
 
     private void enforceBeginningAccess() {
