@@ -67,6 +67,8 @@ public final class DifficultyChanges implements Listener {
     private final NamespacedKey xpBottleRecipeKey;
     private final NamespacedKey batAttackOriginalKey;
     private final NamespacedKey dragonHealthOriginalKey;
+    private final NamespacedKey bruteWeaponGrantedKey;
+    private final NamespacedKey allayWeaponGrantedKey;
 
     private boolean xpBottleRecipeRegistered = false;
     private long lastRefreshedDay = Long.MIN_VALUE;
@@ -80,6 +82,8 @@ public final class DifficultyChanges implements Listener {
         this.xpBottleRecipeKey = new NamespacedKey(plugin, "day15_xp_bottles");
         this.batAttackOriginalKey = new NamespacedKey(plugin, "difficulty_bat_attack_original");
         this.dragonHealthOriginalKey = new NamespacedKey(plugin, "difficulty_dragon_health_original");
+        this.bruteWeaponGrantedKey = new NamespacedKey(plugin, "difficulty_brute_weapon_granted");
+        this.allayWeaponGrantedKey = new NamespacedKey(plugin, "difficulty_allay_weapon_granted");
 
         // Daños por inventario/bloques, Darkness, agua, Elytras, Saturación y Warden de día 60.
         Bukkit.getScheduler().runTaskTimer(plugin, this::tickPlayers, 20L, 20L);
@@ -207,6 +211,11 @@ public final class DifficultyChanges implements Listener {
             if (entity instanceof PiglinBrute brute) {
                 EntityEquipment equipment = brute.getEquipment();
                 if (equipment != null) {
+                    ItemStack current = equipment.getItemInMainHand();
+                    if (current != null && !current.getType().isAir() && current.getType() != Material.GOLDEN_AXE) {
+                        // No pisar equipamiento colocado por otro sistema.
+                        continue;
+                    }
                     ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
                     ItemMeta meta = axe.getItemMeta();
                     if (meta != null) {
@@ -215,6 +224,7 @@ public final class DifficultyChanges implements Listener {
                     }
                     equipment.setItemInMainHand(axe);
                     equipment.setItemInMainHandDropChance(0.0F);
+                    entity.getPersistentDataContainer().set(bruteWeaponGrantedKey, PersistentDataType.BYTE, (byte) 1);
                 }
             }
 
@@ -239,6 +249,10 @@ public final class DifficultyChanges implements Listener {
             if (entity instanceof Allay allay) {
                 EntityEquipment equipment = allay.getEquipment();
                 if (equipment != null) {
+                    ItemStack current = equipment.getItemInMainHand();
+                    if (current != null && !current.getType().isAir()) {
+                        continue;
+                    }
                     ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
                     ItemMeta meta = sword.getItemMeta();
                     if (meta != null) {
@@ -247,6 +261,7 @@ public final class DifficultyChanges implements Listener {
                     }
                     equipment.setItemInMainHand(sword);
                     equipment.setItemInMainHandDropChance(0.0F);
+                    entity.getPersistentDataContainer().set(allayWeaponGrantedKey, PersistentDataType.BYTE, (byte) 1);
                 }
             }
 
@@ -307,6 +322,7 @@ public final class DifficultyChanges implements Listener {
         }
         if (day < 15) {
             restoreAttribute(entity, batAttackOriginalKey);
+            restoreGrantedWeapon(entity);
         }
         if (day < 35) {
             restoreAttribute(entity, dragonHealthOriginalKey);
@@ -314,6 +330,23 @@ public final class DifficultyChanges implements Listener {
         if (entity.getPersistentDataContainer().has(saturationGrantedKey, PersistentDataType.BYTE) && day < 45) {
             entity.removePotionEffect(PotionEffectType.SATURATION);
             entity.getPersistentDataContainer().remove(saturationGrantedKey);
+        }
+    }
+
+    private void restoreGrantedWeapon(LivingEntity entity) {
+        if (!(entity instanceof Mob mob) || mob.getEquipment() == null) return;
+        EntityEquipment equipment = mob.getEquipment();
+
+        if (entity.getPersistentDataContainer().has(bruteWeaponGrantedKey, PersistentDataType.BYTE)) {
+            equipment.setItemInMainHand(new ItemStack(Material.GOLDEN_AXE));
+            equipment.setItemInMainHandDropChance(0.085F);
+            entity.getPersistentDataContainer().remove(bruteWeaponGrantedKey);
+        }
+
+        if (entity.getPersistentDataContainer().has(allayWeaponGrantedKey, PersistentDataType.BYTE)) {
+            equipment.setItemInMainHand(null);
+            equipment.setItemInMainHandDropChance(0.0F);
+            entity.getPersistentDataContainer().remove(allayWeaponGrantedKey);
         }
     }
 
