@@ -668,7 +668,7 @@ public class PlayerListener implements Listener {
 
         if (Main.instance.getDay() >= 40) {
             if (e.getItem().hasItemMeta()) {
-                if (e.getItem().getItemMeta().hasDisplayName()) {
+                if (e.getItem().hasItemMeta() && e.getItem().getItemMeta() != null && e.getItem().getItemMeta().hasDisplayName()) {
 
                     if (e.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(TextUtils.format("&6Super Golden Apple +"))) {
                         Player p = e.getPlayer();
