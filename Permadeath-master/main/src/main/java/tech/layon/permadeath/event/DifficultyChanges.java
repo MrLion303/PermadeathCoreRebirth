@@ -212,19 +212,17 @@ public final class DifficultyChanges implements Listener {
                 EntityEquipment equipment = brute.getEquipment();
                 if (equipment != null) {
                     ItemStack current = equipment.getItemInMainHand();
-                    if (current != null && !current.getType().isAir() && current.getType() != Material.GOLDEN_AXE) {
-                        // No pisar equipamiento colocado por otro sistema.
-                        continue;
+                    if (current == null || current.getType().isAir() || current.getType() == Material.GOLDEN_AXE) {
+                        ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
+                        ItemMeta meta = axe.getItemMeta();
+                        if (meta != null) {
+                            meta.addEnchant(Enchantment.FIRE_ASPECT, 2, true);
+                            axe.setItemMeta(meta);
+                        }
+                        equipment.setItemInMainHand(axe);
+                        equipment.setItemInMainHandDropChance(0.0F);
+                        entity.getPersistentDataContainer().set(bruteWeaponGrantedKey, PersistentDataType.BYTE, (byte) 1);
                     }
-                    ItemStack axe = new ItemStack(Material.DIAMOND_AXE);
-                    ItemMeta meta = axe.getItemMeta();
-                    if (meta != null) {
-                        meta.addEnchant(Enchantment.FIRE_ASPECT, 2, true);
-                        axe.setItemMeta(meta);
-                    }
-                    equipment.setItemInMainHand(axe);
-                    equipment.setItemInMainHandDropChance(0.0F);
-                    entity.getPersistentDataContainer().set(bruteWeaponGrantedKey, PersistentDataType.BYTE, (byte) 1);
                 }
             }
 
@@ -250,18 +248,17 @@ public final class DifficultyChanges implements Listener {
                 EntityEquipment equipment = allay.getEquipment();
                 if (equipment != null) {
                     ItemStack current = equipment.getItemInMainHand();
-                    if (current != null && !current.getType().isAir()) {
-                        continue;
+                    if (current == null || current.getType().isAir()) {
+                        ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
+                        ItemMeta meta = sword.getItemMeta();
+                        if (meta != null) {
+                            meta.addEnchant(Enchantment.SHARPNESS, 5, true);
+                            sword.setItemMeta(meta);
+                        }
+                        equipment.setItemInMainHand(sword);
+                        equipment.setItemInMainHandDropChance(0.0F);
+                        entity.getPersistentDataContainer().set(allayWeaponGrantedKey, PersistentDataType.BYTE, (byte) 1);
                     }
-                    ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
-                    ItemMeta meta = sword.getItemMeta();
-                    if (meta != null) {
-                        meta.addEnchant(Enchantment.SHARPNESS, 5, true);
-                        sword.setItemMeta(meta);
-                    }
-                    equipment.setItemInMainHand(sword);
-                    equipment.setItemInMainHandDropChance(0.0F);
-                    entity.getPersistentDataContainer().set(allayWeaponGrantedKey, PersistentDataType.BYTE, (byte) 1);
                 }
             }
 
