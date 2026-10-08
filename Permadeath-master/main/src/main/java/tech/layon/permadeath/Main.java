@@ -749,7 +749,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     protected String setupWorld() {
 
-        if (Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.MainWorld"))) == null) {
+        if (Bukkit.getWorld(instance.getConfig().getString("Worlds.MainWorld", "world")) == null) {
 
             for (World w : Bukkit.getWorlds()) {
                 if (w.getEnvironment() == World.Environment.NORMAL) {
@@ -767,7 +767,7 @@ public final class Main extends JavaPlugin implements Listener {
             world = Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.MainWorld")));
         }
 
-        if (Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.EndWorld"))) == null) {
+        if (Bukkit.getWorld(instance.getConfig().getString("Worlds.EndWorld", "world_the_end")) == null) {
 
             PDCLog.getInstance().log("[ERROR] Error al cargar el mundo del end, esto hará que el end no funcione como debe.", true);
             PDCLog.getInstance().log("[ERROR] Abre el archivo config.yml y establece el mundo del end en la opción: EndWorld", true);
