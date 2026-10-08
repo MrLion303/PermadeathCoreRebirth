@@ -77,7 +77,7 @@ public class BeginningDataManager {
 
     public void addPopulatedChest(Location l) {
 
-        ArrayList<String> chests = (ArrayList<String>) config.getStringList("PopulatedChests");
+        ArrayList<String> chests = new ArrayList<>(config.getStringList("PopulatedChests"));
 
         chests.add(locationToString(l));
 
