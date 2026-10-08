@@ -100,6 +100,7 @@ public final class Main extends JavaPlugin implements Listener {
     private SpawnListener spawnListener;
     private DifficultyChanges difficultyChanges;
     private boolean beginningWarningShown = false;
+    private int witherTimer = 0;
 
     public static boolean optifineItemsEnabled() {
         if (instance == null) return false;
@@ -211,7 +212,53 @@ public final class Main extends JavaPlugin implements Listener {
 
                     if (playTime % (3600) == 0) {
                         Bukkit.broadcastMessage(prefix + TextUtils.format("&cFelicitaciones, han avanzado a la hora número: " + getDay()));
-                        for (Player player : Bukkit.getOnlinePlayers()) {
+                        if (getDay() >= 50 && getBeData() != null && getBeginningManager() != null) {
+            BeginningDataManager data = getBeData();
+            World beginningWorld = getBeginningManager().getBeginningWorld();
+            if (beginningWorld != null && !data.killedED()) {
+                Chunk c = beginningWorld.getBlockAt(0, 100, 0).getChunk();
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        for (int y = beginningWorld.getMaxHeight() - 1; y > 0; y--) {
+                            Block b = c.getBlock(x, y, z);
+                            if (b.getType() == Material.END_GATEWAY || b.getType() == Material.BEDROCK) {
+                                b.setType(Material.AIR);
+                            }
+                        }
+                    }
+                }
+                for (EnderDragon dragon : beginningWorld.getEntitiesByClass(EnderDragon.class)) {
+                    dragon.remove();
+                }
+                if (!beginningWorld.getEntitiesByClass(EnderDragon.class).isEmpty()) {
+                    data.setKilledED();
+                } else {
+                    data.setKilledED();
+                }
+            }
+        }
+
+        if (getDay() >= 60) {
+            witherTimer++;
+            if (witherTimer >= 2400) {
+                Player target = Bukkit.getOnlinePlayers().stream()
+                        .filter(p -> p.getGameMode() == GameMode.SURVIVAL && p.getWorld() != null)
+                        .findFirst().orElse(null);
+                if (target != null) {
+                    Wither wither = target.getWorld().spawn(target.getLocation().clone().add(0, 5, 0), Wither.class);
+                    try {
+                        Object nmsw = wither.getClass().getDeclaredMethod("getHandle").invoke(wither);
+                        nmsw.getClass().getDeclaredMethod("r", int.class).invoke(nmsw, 100);
+                    } catch (Exception ignored) {
+                    }
+                }
+                witherTimer = 0;
+            }
+        } else {
+            witherTimer = 0;
+        }
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100.0F, 100.0F);
                         }
                     }
@@ -341,30 +388,6 @@ public final class Main extends JavaPlugin implements Listener {
 
             if (getDay() >= 50) {
 
-                if (getBeData() != null && getBeginningManager() != null) {
-
-                    BeginningDataManager data = getBeData();
-                    World beginningWorld = getBeginningManager().getBeginningWorld();
-
-                    if (!data.killedED()) {
-                        Chunk c = beginningWorld.getBlockAt(0, 100, 0).getChunk();
-                        for (int X = 0; X < 16; X++)
-                            for (int y = beginningWorld.getMaxHeight() - 1; y > 0; y--)
-                                for (int Z = 0; Z < 16; Z++) {
-                                    Block b = c.getBlock(X, y, Z);
-                                    if (b.getType() == Material.END_GATEWAY || b.getType() == Material.BEDROCK) {
-                                        b.setType(Material.AIR);
-                                    }
-                                }
-                        if (beginningWorld.getEntitiesByClass(EnderDragon.class).size() >= 1) {
-                            for (EnderDragon d : beginningWorld.getEntitiesByClass(EnderDragon.class)) {
-                                d.remove();
-                            }
-                            data.setKilledED();
-                        }
-                    }
-                }
-
                 if (player.hasPotionEffect(PotionEffectType.MINING_FATIGUE)) {
                     PotionEffect e = player.getPotionEffect(PotionEffectType.MINING_FATIGUE);
                     if (e.getDuration() >= 4 * 60 * 20 && !getDoneEffectPlayers().contains(player)) {
@@ -408,21 +431,6 @@ public final class Main extends JavaPlugin implements Listener {
                 if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.SOUL_SAND) {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 30 * 20, 2));
                 }
-                Integer timeForWither = player.getPersistentDataContainer().get(new NamespacedKey(this, "wither"), PersistentDataType.INTEGER);
-                if (timeForWither == null) {
-                    timeForWither = 0;
-                }
-                if (timeForWither % (60 * 60) == 0 && player.getGameMode() == GameMode.SURVIVAL) {
-                    timeForWither = 0;
-                    Wither wither = player.getWorld().spawn(player.getLocation().clone().add(0, 5, 0), Wither.class);
-                    try {
-                        Object nmsw = wither.getClass().getDeclaredMethod("getHandle").invoke(wither);
-                        nmsw.getClass().getDeclaredMethod("r", int.class).invoke(nmsw, 100);
-                    } catch (Exception x) {
-                    }
-                }
-                player.getPersistentDataContainer().set(new NamespacedKey(this, "wither"), PersistentDataType.INTEGER, ++timeForWither);
-
                 if (getConfig().getBoolean("Toggles.Mike-Creeper-Spawn")) {
 
                     Location l = player.getLocation().clone();
