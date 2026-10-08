@@ -69,6 +69,7 @@ public final class DifficultyChanges implements Listener {
     private final NamespacedKey dragonHealthOriginalKey;
 
     private boolean xpBottleRecipeRegistered = false;
+    private long lastRefreshedDay = Long.MIN_VALUE;
 
     public DifficultyChanges(Main plugin) {
         this.plugin = plugin;
@@ -170,7 +171,10 @@ public final class DifficultyChanges implements Listener {
     }
 
     private void refreshLoadedMobs() {
-        if (plugin.getDay() < 5) {
+        long day = plugin.getDay();
+        if (day == lastRefreshedDay) return;
+        lastRefreshedDay = day;
+        if (day < 5) {
             return;
         }
 
