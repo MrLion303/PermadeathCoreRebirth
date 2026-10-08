@@ -27,7 +27,7 @@ jobs:
 
       - name: Compilar con Maven
         working-directory: Permadeath-master
-        run: mvn -B clean package -DskipTests
+        run: mvn -B -pl main -am clean package -DskipTests
 
       - name: Preparar JAR Beta 1.0
         shell: bash
