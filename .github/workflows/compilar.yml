@@ -58,18 +58,27 @@ jobs:
         working-directory: Permadeath-master
         run: mvn -B clean package --no-transfer-progress
 
-      - name: Mostrar JAR generados
+      - name: Preparar plugin final
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          JAR="$(find Permadeath-master/main/target -maxdepth 1 -type f -name '*.jar' ! -name '*sources.jar' ! -name '*javadoc.jar' | head -n 1)"
+          test -n "$JAR"
+          cp "$JAR" "dist/PermadeathCoreRebirth.jar"
+          echo "Plugin listo: dist/PermadeathCoreRebirth.jar"
+
+      - name: Mostrar plugin generado
         if: always()
         shell: bash
         run: |
-          echo "=== JAR GENERADOS ==="
-          find Permadeath-master -type f -name '*.jar' -not -path '*/.git/*' | sort || true
+          echo "=== PLUGIN GENERADO ==="
+          ls -lh dist/PermadeathCoreRebirth.jar 2>/dev/null || true
 
-      - name: Subir JARs
+      - name: Exportar plugin
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: PermadeathCoreRebirth-JARs
-          path: |
-            Permadeath-master/**/target/*.jar
+          name: PermadeathCoreRebirth
+          path: dist/PermadeathCoreRebirth.jar
           if-no-files-found: error
