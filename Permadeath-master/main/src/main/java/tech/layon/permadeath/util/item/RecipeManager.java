@@ -56,6 +56,34 @@ public class RecipeManager {
         }
     }
 
+    public void unregisterRecipesAboveDay(long day) {
+        if (day < 40) {
+            remove("hyper_golden_apple");
+            remove("super_golden_apple");
+            remove("end_relic");
+            for (Material material : Material.values()) {
+                if (material.name().toLowerCase().contains("shulker_box")) {
+                    remove(material.name() + "_uncraft");
+                }
+            }
+        }
+        if (day < 50) {
+            remove("infernal_helmet");
+            remove("infernal_chestplate");
+            remove("infernal_leggings");
+            remove("infernal_boots");
+        }
+        if (day < 60) {
+            remove("infernal_elytra");
+            remove("PERMADEATH_LIFO");
+            remove("beginning_relic");
+        }
+    }
+
+    private void remove(String key) {
+        instance.getServer().removeRecipe(new NamespacedKey(instance, key));
+    }
+
     private void registerBeginningRelic() {
 
         ItemStack s = PermadeathItems.createBeginningRelic();
