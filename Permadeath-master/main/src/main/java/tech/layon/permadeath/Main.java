@@ -552,10 +552,10 @@ public final class Main extends JavaPlugin implements Listener {
             new FileAPI.FileOut(instance, "original_schematics/island5.schem", "schematics/", true);
         }
 
-        int HelmetValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Helmet")));
-        int ChestplateValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Chestplate")));
-        int LeggingsValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Leggings")));
-        int BootsValue = Integer.parseInt(Objects.requireNonNull(instance.getConfig().getString("Toggles.Netherite.Boots")));
+        int HelmetValue = instance.getConfig().getInt("Toggles.Netherite.Helmet", 10);
+        int ChestplateValue = instance.getConfig().getInt("Toggles.Netherite.Chestplate", 10);
+        int LeggingsValue = instance.getConfig().getInt("Toggles.Netherite.Leggings", 10);
+        int BootsValue = instance.getConfig().getInt("Toggles.Netherite.Boots", 10);
         if (HelmetValue > 100 || HelmetValue < 1) {
             PDCLog.getInstance().log("[ERROR] Error al cargar la probabilidad de 'Helmet' en 'config.yml', asegurate de introducir un numero valido del 1 al 100.", true);
             PDCLog.getInstance().log("[ERROR] Ha ocurrido un error al cargar el archivo config.yml, si este error persiste avisanos por discord.", true);
