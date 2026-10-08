@@ -36,6 +36,7 @@ import tech.layon.permadeath.util.item.RecipeManager;
 import tech.layon.permadeath.discord.DiscordPortal;
 import tech.layon.permadeath.end.EndManager;
 import tech.layon.permadeath.event.block.BlockListener;
+import tech.layon.permadeath.event.DifficultyChanges;
 import tech.layon.permadeath.event.entity.EntityEvents;
 import tech.layon.permadeath.util.mob.CustomSkeletons;
 import tech.layon.permadeath.event.entity.SpawnListener;
@@ -97,6 +98,8 @@ public final class Main extends JavaPlugin implements Listener {
     private ShellEvent shulkerEvent;
     private LifeOrbEvent orbEvent;
     private SpawnListener spawnListener;
+    private DifficultyChanges difficultyChanges;
+    private boolean beginningWarningShown = false;
 
     public static boolean optifineItemsEnabled() {
         if (instance == null) return false;
@@ -637,7 +640,6 @@ public final class Main extends JavaPlugin implements Listener {
             registeredDays.replace(30, true);
 
             this.endManager = new EndManager(instance);
-            getServer().getPluginManager().registerEvents(endManager, instance);
 
             this.endData = new EndDataManager(instance);
 
@@ -649,21 +651,25 @@ public final class Main extends JavaPlugin implements Listener {
 
         if (DateManager.getInstance().getDay() >= 40 && !registeredDays.get(40)) {
 
-            registeredDays.replace(40, true);
-            if (this.recipes == null) this.recipes = new RecipeManager(this);
-            this.recipes.registerRecipes();
-            this.getNmsHandler().addMushrooms();
-            getServer().getPluginManager().registerEvents(new SlotBlockListener(instance), instance);
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b40"));
+            if (!worldEditFound) {
+                if (!beginningWarningShown) {
+                    beginningWarningShown = true;
+                    Bukkit.broadcastMessage(TextUtils.format(prefix + "&4&lNo se pudo registrar TheBeginning ya que no se ha encontrado WorldEdit/FAWE."));
+                    Bukkit.broadcastMessage(TextUtils.format(prefix + "&7Instala WorldEdit o FastAsyncWorldEdit y reinicia el servidor para habilitar TheBeginning."));
+                }
+            } else {
+                if (this.recipes == null) this.recipes = new RecipeManager(this);
+                this.recipes.registerRecipes();
+                this.getNmsHandler().addMushrooms();
+                getServer().getPluginManager().registerEvents(new SlotBlockListener(instance), instance);
 
-            if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
-                Bukkit.broadcastMessage(TextUtils.format(prefix + "&4&lNo se pudo registrar TheBeginning ya que no se ha encontrado el plugin &7WorldEdit"));
-                Bukkit.broadcastMessage(TextUtils.format(prefix + "&7Si necesitas soporte entra a este discord: &e" + Utils.SPIGOT_LINK));
-                return;
+                this.beData = new BeginningDataManager(this);
+                this.begginingManager = new BeginningManager(this);
+                registeredDays.replace(40, true);
+
+                Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios para el día &b40"));
+                Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios de TheBeginning"));
             }
-            this.beData = new BeginningDataManager(this);
-            this.begginingManager = new BeginningManager(this);
-            Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios de TheBeginning"));
         }
 
         if (DateManager.getInstance().getDay() >= 50 && !registeredDays.get(50)) {
@@ -735,7 +741,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             for (World w : Bukkit.getWorlds()) {
                 if (w.getEnvironment() == World.Environment.THE_END) {
-                    this.endWorld = world;
+                    this.endWorld = w;
                     PDCLog.getInstance().log("[INFO] El plugin utilizará el mundo " + w.getName() + " como mundo del End.", true);
                     break;
                 }
@@ -804,6 +810,8 @@ public final class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new TotemListener(), instance);
         getServer().getPluginManager().registerEvents(new RaidEvents(), instance);
         getServer().getPluginManager().registerEvents(new WorldEvents(), instance);
+        this.difficultyChanges = new DifficultyChanges(this);
+        getServer().getPluginManager().registerEvents(this.difficultyChanges, instance);
         registeredDays.put(1, false);
         registeredDays.put(20, false);
         registeredDays.put(30, false);
