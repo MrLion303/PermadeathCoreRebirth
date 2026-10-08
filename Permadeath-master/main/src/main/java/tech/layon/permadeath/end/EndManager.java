@@ -43,8 +43,6 @@ public class EndManager implements Listener {
     public EndManager(Main main) {
         this.main = main;
 
-        main.getServer().getPluginManager().registerEvents(this, main);
-
         this.enderCreepers = new ArrayList<>();
         this.enderGhasts = new ArrayList<>();
         this.random = new SplittableRandom();
