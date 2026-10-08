@@ -180,26 +180,30 @@ public final class Main extends JavaPlugin implements Listener {
                         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&eSi no puedes descargarlo allí, únete a este Discord y te daremos acceso al enlace: &ehttps://discord.gg/nKxBA7qzAU"));
                     }
 
-                    startPlugin();
+                    // Completa las claves que falten antes de arrancar los sistemas que leen la configuración.
                     setupConfig();
+                    reloadConfig();
 
+                    boolean resetConfig = false;
                     if (!getConfig().contains("config-version")) {
+                        resetConfig = true;
+                    } else {
+                        try {
+                            resetConfig = getConfig().getInt("config-version") != CURRENT_CONFIG_VERSION;
+                        } catch (Exception ignored) {
+                            resetConfig = true;
+                        }
+                    }
+
+                    if (resetConfig) {
+                        Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eEstamos eliminando config.yml debido a que está desactualizado."));
                         PDCLog.getInstance().log("Eliminando config.yml por versión antigua.");
                         getFile().delete();
                         saveDefaultConfig();
-                    } else {
-                        try {
-                            int version = getConfig().getInt("config-version");
-                            if (version != CURRENT_CONFIG_VERSION) {
-                                Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eEstamos eliminando config.yml debido a que está desactualizado."));
-                                PDCLog.getInstance().log("Eliminando config.yml por versión antigua.");
-                                getFile().delete();
-                                saveDefaultConfig();
-                            }
-                        } catch (Exception x) {
-                            getFile().delete();
-                        }
+                        reloadConfig();
                     }
+
+                    startPlugin();
 
                     if (getConfig().getBoolean("Toggles.Replace-Mobs-On-Chunk-Load")) {
                         for (World worlds : Bukkit.getWorlds()) {
