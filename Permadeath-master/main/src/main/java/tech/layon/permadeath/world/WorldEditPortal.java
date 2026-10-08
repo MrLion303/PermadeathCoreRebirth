@@ -109,7 +109,13 @@ public class WorldEditPortal {
                 Main.getInstance().getLogger().warning("No se encontró el schematic ytic.schem.");
                 return false;
             }
-            try (InputStream stream = resource; ClipboardReader reader = ClipboardFormats.findByFile(new File("ytic.schem")).getReader(stream)) {
+            ClipboardFormat resourceFormat = ClipboardFormats.findByFile(new File("ytic.schem"));
+            if (resourceFormat == null) {
+                resource.close();
+                Main.getInstance().getLogger().warning("WorldEdit no reconoce el formato de ytic.schem.");
+                return false;
+            }
+            try (InputStream stream = resource; ClipboardReader reader = resourceFormat.getReader(stream)) {
                 clipboard = reader.read();
             } catch (IOException | NullPointerException e) {
                 e.printStackTrace();
