@@ -1054,7 +1054,10 @@ public class PlayerListener implements Listener {
                     }
                 }
 
-                if (res.getItemMeta().hasDisplayName() && res.getItemMeta().getDisplayName().contains(TextUtils.format("&6Hyper Golden Apple +")) || res.getItemMeta().getDisplayName().contains(TextUtils.format("&6Super Golden Apple +"))) {
+                ItemMeta resultMeta = res.getItemMeta();
+                if (resultMeta != null && resultMeta.hasDisplayName()
+                        && (resultMeta.getDisplayName().contains(TextUtils.format("&6Hyper Golden Apple +"))
+                        || resultMeta.getDisplayName().contains(TextUtils.format("&6Super Golden Apple +")))) {
                     if (e.getWhoClicked() instanceof Player) {
 
                         e.getInventory().setMatrix(clearMatrix());
