@@ -661,6 +661,13 @@ public class SpawnListener implements Listener {
         if (plugin.getDay() >= 40) {
             // Estas conversiones son transformaciones globales: si el día ya llegó,
             // también afectan a entidades que existían antes del cambio.
+            if (entity instanceof Spider) {
+                Location location = entity.getLocation().clone();
+                entity.remove();
+                plugin.getNmsHandler().spawnNMSEntity("CaveSpider", EntityType.CAVE_SPIDER, location,
+                        CreatureSpawnEvent.SpawnReason.NATURAL);
+            }
+
             if (entity instanceof Zombie) {
                 Location location = entity.getLocation().clone();
                 entity.remove();
@@ -707,6 +714,12 @@ public class SpawnListener implements Listener {
                 } else {
                     plugin.getNmsHandler().spawnNMSEntity("Ravager", EntityType.RAVAGER, location, CreatureSpawnEvent.SpawnReason.NATURAL);
                 }
+            }
+
+            if (plugin.getDay() >= 60 && entity instanceof Guardian) {
+                Location location = entity.getLocation().clone();
+                entity.remove();
+                location.getWorld().spawnEntity(location, EntityType.ELDER_GUARDIAN);
             }
 
             // Desde el día 50 todos los Ravagers existentes pasan a ser Ultra Ravagers.
