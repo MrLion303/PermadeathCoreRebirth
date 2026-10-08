@@ -88,22 +88,37 @@ public class EndTask extends BukkitRunnable {
     }
 
     private void tickEnderCrystals() {
-        if (!regenTime.isEmpty()) {
-            for (org.bukkit.Location loc : regenTime.keySet()) {
-                int time = regenTime.get(loc);
-                if (time >= 1) {
-                    regenTime.replace(loc, time, time - 1);
-                } else {
-                    loc.getWorld().spawnEntity(loc, EntityType.END_CRYSTAL);
-                    regenTime.remove(loc);
-                    if (loc.getWorld().getBlockAt(loc) != null) {
-                        if (loc.getWorld().getBlockAt(loc).getType() == Material.BEDROCK || loc.getWorld().getBlockAt(loc).getType() == Material.AIR) {
-                            return;
-                        }
-                        loc.getWorld().getBlockAt(loc).setType(Material.AIR);
-                    }
-                }
+        if (regenTime.isEmpty()) {
+            return;
+        }
+
+        ArrayList<Location> ready = new ArrayList<>();
+
+        for (Map.Entry<Location, Integer> entry : new ArrayList<>(regenTime.entrySet())) {
+            Location loc = entry.getKey();
+            int time = entry.getValue();
+
+            if (time > 0) {
+                regenTime.put(loc, time - 1);
+            } else {
+                ready.add(loc);
             }
+        }
+
+        for (Location loc : ready) {
+            regenTime.remove(loc);
+
+            if (loc.getWorld() == null) {
+                continue;
+            }
+
+            // La posición queda libre antes de crear el cristal.
+            Material blockType = loc.getBlock().getType();
+            if (blockType != Material.BEDROCK && blockType != Material.AIR) {
+                loc.getBlock().setType(Material.AIR);
+            }
+
+            loc.getWorld().spawnEntity(loc, EntityType.END_CRYSTAL);
         }
     }
 
