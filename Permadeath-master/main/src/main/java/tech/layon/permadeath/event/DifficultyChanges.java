@@ -282,13 +282,28 @@ public final class DifficultyChanges implements Listener {
         long day = plugin.getDay();
 
         if (day < 5) {
+            if (entity instanceof Warden || entity instanceof Piglin || entity instanceof PiglinBrute) {
+                removeEffect(entity, PotionEffectType.SPEED);
+                removeEffect(entity, PotionEffectType.RESISTANCE);
+            }
+            if (entity instanceof Piglin) {
+                removeEffect(entity, PotionEffectType.STRENGTH);
+                removeEffect(entity, PotionEffectType.FIRE_RESISTANCE);
+            }
             removeTaggedEffect(entity, PotionEffectType.SPEED);
             removeTaggedEffect(entity, PotionEffectType.RESISTANCE);
             removeTaggedEffect(entity, PotionEffectType.FIRE_RESISTANCE);
         }
         if (day < 10) {
+            if (entity instanceof Warden) removeEffect(entity, PotionEffectType.INVISIBILITY);
             removeTaggedEffect(entity, PotionEffectType.INVISIBILITY);
-            removeTaggedEffect(entity, PotionEffectType.STRENGTH);
+        }
+        if (day < 15) {
+            if (entity instanceof Frog || entity instanceof Piglin || entity instanceof Camel || entity instanceof Bat || entity instanceof Illusioner) {
+                removeEffect(entity, PotionEffectType.STRENGTH);
+                removeEffect(entity, PotionEffectType.SPEED);
+                removeEffect(entity, PotionEffectType.RESISTANCE);
+            }
         }
         if (day < 15) {
             restoreAttribute(entity, batAttackOriginalKey);
@@ -302,7 +317,7 @@ public final class DifficultyChanges implements Listener {
         }
     }
 
-    private void removeTaggedEffect(LivingEntity entity, PotionEffectType type) {
+    private void removeEffect(LivingEntity entity, PotionEffectType type) {\n        entity.removePotionEffect(type);\n    }\n\n    private void removeTaggedEffect(LivingEntity entity, PotionEffectType type) {
         String keyName = "difficulty_effect_" + type.getName().toLowerCase();
         NamespacedKey key = new NamespacedKey(plugin, keyName);
         if (entity.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
