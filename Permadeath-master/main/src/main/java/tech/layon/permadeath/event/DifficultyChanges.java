@@ -335,14 +335,20 @@ public final class DifficultyChanges implements Listener {
         EntityEquipment equipment = mob.getEquipment();
 
         if (entity.getPersistentDataContainer().has(bruteWeaponGrantedKey, PersistentDataType.BYTE)) {
-            equipment.setItemInMainHand(new ItemStack(Material.GOLDEN_AXE));
-            equipment.setItemInMainHandDropChance(0.085F);
+            ItemStack current = equipment.getItemInMainHand();
+            if (current != null && current.getType() == Material.DIAMOND_AXE) {
+                equipment.setItemInMainHand(new ItemStack(Material.GOLDEN_AXE));
+                equipment.setItemInMainHandDropChance(0.085F);
+            }
             entity.getPersistentDataContainer().remove(bruteWeaponGrantedKey);
         }
 
         if (entity.getPersistentDataContainer().has(allayWeaponGrantedKey, PersistentDataType.BYTE)) {
-            equipment.setItemInMainHand(null);
-            equipment.setItemInMainHandDropChance(0.0F);
+            ItemStack current = equipment.getItemInMainHand();
+            if (current != null && current.getType() == Material.NETHERITE_SWORD) {
+                equipment.setItemInMainHand(null);
+                equipment.setItemInMainHandDropChance(0.0F);
+            }
             entity.getPersistentDataContainer().remove(allayWeaponGrantedKey);
         }
     }
