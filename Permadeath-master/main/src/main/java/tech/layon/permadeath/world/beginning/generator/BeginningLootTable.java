@@ -13,7 +13,7 @@ public class BeginningLootTable {
 
     private final List<Integer> randomLoc = new ArrayList<>();
     private final List<String> chances;
-    private final List<Material> alreadyRolled;
+    private final Set<Material> alreadyRolled;
     private final SplittableRandom random;
 
     public BeginningLootTable(BeginningManager man) {
@@ -23,7 +23,7 @@ public class BeginningLootTable {
         }
 
         this.chances = new ArrayList<>();
-        this.alreadyRolled = new ArrayList<>();
+        this.alreadyRolled = new HashSet<>();
         this.random = new SplittableRandom();
 
         addItem(chances, Material.GOLD_INGOT, 5, 50, 60);
@@ -41,9 +41,8 @@ public class BeginningLootTable {
         World w = chest.getWorld();
         Inventory inv = chest.getBlockInventory();
         if (!w.getName().equalsIgnoreCase("pdc_the_beginning")) return;
-        if (inv.contains(Material.DIAMOND_PICKAXE)) {
-            return;
-        }
+        if (inv.contains(Material.DIAMOND_PICKAXE)) return;
+        alreadyRolled.clear();
         roll(chest);
     }
 
@@ -59,40 +58,32 @@ public class BeginningLootTable {
     }
 
     private void generate(Chest chest) {
-        Iterator<String> iterator = chances.iterator();
-        int added;
-        while (iterator.hasNext()) {
-            String[] split = String.valueOf(iterator.next()).split(";");
-            Inventory inventory = chest.getBlockInventory();
-
-            Collections.shuffle(this.randomLoc);
-
-            added = 0;
-            if (random.nextInt(100) + 1 <= getChance(split) && !alreadyRolled.contains(getMaterial(split))) {
-                if (getMaterial(split) == Material.TOTEM_OF_UNDYING || getMaterial(split) == Material.STRUCTURE_VOID) {
-                    inventory.setItem(this.randomLoc.get(added), new ItemStack(getMaterial(split)));
-                    return;
-                }
-                int ammount = generateValue(getMin(split), getMax(split));
-                ItemStack s = new ItemStack(getMaterial(split), ammount);
-                inventory.setItem(this.randomLoc.get(added), s);
-
-                try {
-                    int x = ammount + getMin(split) / 2;
-                    ItemStack s2 = new ItemStack(s.getType(), x);
-
-                    int r = random.nextInt(5) + 1;
-                    int slot = (random.nextBoolean() ? -1 : 1) * r;
-
-                    inventory.setItem(this.randomLoc.get(added + slot), s2);
-                } catch (Exception x) {
-                }
-
-                if (added++ >= inventory.getSize() - 1) {
-                    break;
-                }
-                alreadyRolled.add(s.getType());
+        Inventory inventory = chest.getBlockInventory();
+        List<Integer> freeSlots = new ArrayList<>();
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            if (inventory.getItem(slot) == null || inventory.getItem(slot).getType().isAir()) {
+                freeSlots.add(slot);
             }
+        }
+        if (freeSlots.isEmpty()) return;
+
+        Collections.shuffle(freeSlots);
+        for (String entry : chances) {
+            String[] split = entry.split(";");
+            Material material = getMaterial(split);
+            if (alreadyRolled.contains(material)) continue;
+            if (random.nextInt(100) + 1 > getChance(split)) continue;
+
+            int amount = generateValue(getMin(split), getMax(split));
+            int slot = freeSlots.remove(freeSlots.size() - 1);
+            inventory.setItem(slot, new ItemStack(material, amount));
+            alreadyRolled.add(material);
+
+            // Los objetos especiales ocupan una sola casilla.
+            if (material == Material.TOTEM_OF_UNDYING || material == Material.STRUCTURE_VOID) {
+                return;
+            }
+            break;
         }
     }
 
@@ -124,7 +115,8 @@ public class BeginningLootTable {
     }
 
     private int generateValue(int min, int max) {
-        return random.nextInt(max - min) + random.nextInt(min) + 1;
+        if (max <= min) return Math.max(1, min);
+        return random.nextInt(min, max + 1);
     }
 }
 
