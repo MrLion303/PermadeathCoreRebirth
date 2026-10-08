@@ -61,8 +61,15 @@ public class DateManager {
     }
 
     public void reloadDate() {
-        this.date = this.c.getString("Fecha");
-        this.startDate = LocalDate.parse(this.date);
+        this.date = this.c.getString("Fecha", getDateForDayOne());
+        try {
+            this.startDate = LocalDate.parse(this.date);
+        } catch (DateTimeParseException ex) {
+            this.startDate = LocalDate.parse(getDateForDayOne());
+            this.c.set("Fecha", getDateForDayOne());
+            saveFile();
+            reloadFile();
+        }
         this.currentDate = LocalDate.now();
     }
 
