@@ -84,14 +84,14 @@ public class BeginningManager implements Listener {
         }
         Player p = e.getPlayer();
         if (e.getCause() != PlayerTeleportEvent.TeleportCause.END_GATEWAY) return;
-        if (p.getWorld().getName().equalsIgnoreCase(main.world.getName())) {
+        if (p.getWorld().equals(main.world)) {
             try {
                 e.getClass().getDeclaredMethod("setCanCreatePortal", Boolean.class).invoke(e, false);
             } catch (Exception x) {
             }
         }
 
-        if (p.getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+        if (beginningWorld != null && p.getWorld().equals(beginningWorld)) {
             if (p.getLocation().getBlock().getState() instanceof EndGateway) {
                 EndGateway gateway = (EndGateway) p.getLocation().getBlock().getState();
                 gateway.setExitLocation(null);
@@ -118,7 +118,7 @@ public class BeginningManager implements Listener {
         }
 
         if (main.getDay() < 50) {
-            if (e.getPlayer().getWorld().getName().equalsIgnoreCase(main.world.getName()) || e.getPlayer().getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+            if (e.getPlayer().getWorld().equals(main.world) || (beginningWorld != null && e.getPlayer().getWorld().equals(beginningWorld))) {
                 e.getPlayer().setNoDamageTicks(e.getPlayer().getMaximumNoDamageTicks());
                 e.getPlayer().damage(e.getPlayer().getHealth() + 1.0D);
                 e.getPlayer().setNoDamageTicks(0);
@@ -127,7 +127,7 @@ public class BeginningManager implements Listener {
             return;
         }
 
-        if (p.getWorld().getName().equalsIgnoreCase(main.world.getName())) {
+        if (p.getWorld().equals(main.world)) {
 
             e.getPlayer().sendMessage(TextUtils.format("&eBienvenido a The Beginning."));
             e.getPlayer().teleport(beginningWorld.getSpawnLocation());
@@ -143,7 +143,7 @@ public class BeginningManager implements Listener {
 
         int x = (int) p.getLocation().getX();
         int z = (int) p.getLocation().getZ();
-        if (p.getWorld().getName().equalsIgnoreCase(beginningWorld.getName()) && x != 200 && z != 200) {
+        if (beginningWorld != null && p.getWorld().equals(beginningWorld) && !(x == 200 && z == 200)) {
 
             if (p.getLocation().getBlock().getState() instanceof EndGateway) {
 
@@ -225,7 +225,7 @@ public class BeginningManager implements Listener {
     @EventHandler
     public void onBucket(PlayerBucketEmptyEvent e) {
         if (beginningWorld == null) return;
-        if (e.getPlayer().getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+        if (beginningWorld != null && e.getPlayer().getWorld().equals(beginningWorld)) {
             e.setCancelled(true);
         }
     }
@@ -235,7 +235,7 @@ public class BeginningManager implements Listener {
         if (beginningWorld == null) return;
         if (e.getItem() != null) {
             if (e.getItem().getType() == Material.BUCKET || e.getItem().getType() == Material.WATER_BUCKET) {
-                if (e.getBlock().getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+                if (e.getBlock().getWorld().equals(beginningWorld)) {
                     e.setCancelled(true);
                 }
             }
@@ -248,7 +248,7 @@ public class BeginningManager implements Listener {
         if (beginningWorld == null) return;
         if (e.isCancelled() || e.getSpawner() == null) return;
         CreatureSpawner spawner = e.getSpawner();
-        if (e.getEntity().getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+        if (beginningWorld != null && e.getEntity().getWorld().equals(beginningWorld)) {
             if (e.getEntityType() != EntityType.ARMOR_STAND) {
                 spawner.setSpawnedType(e.getEntityType());
                 spawner.update();
@@ -278,7 +278,7 @@ public class BeginningManager implements Listener {
 
         if (beginningWorld == null) return;
 
-        if (e.getPlayer().getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+        if (beginningWorld != null && e.getPlayer().getWorld().equals(beginningWorld)) {
             if (e.getBlock().getState() instanceof Chest) {
                 BeginningDataManager ma = main.getBeData();
                 ma.addPopulatedChest(e.getBlock().getLocation());
