@@ -768,6 +768,15 @@ public final class Main extends JavaPlugin implements Listener {
             endWorld = Bukkit.getWorld(Objects.requireNonNull(instance.getConfig().getString("Worlds.EndWorld")));
         }
 
+        if (this.world == null) {
+            PDCLog.getInstance().log("[ERROR] No se pudo resolver ningún mundo principal.");
+            return "&cOverworld no encontrado";
+        }
+        if (this.endWorld == null) {
+            PDCLog.getInstance().log("[ERROR] No se pudo resolver ningún mundo del End.");
+            return "&cEnd no encontrado";
+        }
+
         boolean dobleCap = getConfig().getBoolean("Toggles.Doble-Mob-Cap") && getDay() >= 10;
         if (dobleCap) Bukkit.getConsoleSender().sendMessage(prefix + "&eDoblando la mob-cap en todos los mundos.");
 
