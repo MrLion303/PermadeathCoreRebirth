@@ -67,7 +67,6 @@ public final class DifficultyChanges implements Listener {
     private final NamespacedKey xpBottleRecipeKey;
 
     private boolean xpBottleRecipeRegistered = false;
-    private long lastRefreshedDay = Long.MIN_VALUE;
 
     public DifficultyChanges(Main plugin) {
         this.plugin = plugin;
@@ -79,8 +78,6 @@ public final class DifficultyChanges implements Listener {
         // Daños por inventario/bloques, Darkness, agua, Elytras, Saturación y Warden de día 60.
         Bukkit.getScheduler().runTaskTimer(plugin, this::tickPlayers, 20L, 20L);
 
-        // Reaplica los cambios a mobs que ya estaban cargados al cambiar de día.
-        Bukkit.getScheduler().runTaskTimer(plugin, this::refreshLoadedMobs, 40L, 200L);
     }
 
     private void tickPlayers() {
@@ -161,24 +158,6 @@ public final class DifficultyChanges implements Listener {
                 }
 
                 processDay60WardenRoll(player);
-            }
-        }
-    }
-
-    private void refreshLoadedMobs() {
-        long day = plugin.getDay();
-        if (day == lastRefreshedDay) return;
-        lastRefreshedDay = day;
-        if (day < 5) {
-            return;
-        }
-
-        for (World world : Bukkit.getWorlds()) {
-            for (LivingEntity entity : world.getLivingEntities()) {
-                if (entity instanceof Player || !entity.isValid() || entity.isDead()) {
-                    continue;
-                }
-                applyMobChanges(entity);
             }
         }
     }
