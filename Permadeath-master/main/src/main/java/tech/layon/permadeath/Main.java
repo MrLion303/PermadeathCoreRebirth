@@ -1045,6 +1045,10 @@ public final class Main extends JavaPlugin implements Listener {
         return DateManager.getInstance().getDay();
     }
 
+    public int getWitherTimer() {
+        return witherTimer;
+    }
+
     public HostileEntityListener getHostile() {
         return hostile;
     }
