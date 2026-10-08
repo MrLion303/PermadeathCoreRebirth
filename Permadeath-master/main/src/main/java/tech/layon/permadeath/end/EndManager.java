@@ -113,6 +113,11 @@ public class EndManager implements Listener {
     }
 
     private void generateEndIslands(EndDataManager data) {
+        if (!main.isSmallIslandsEnabled()) {
+            data.setCreatedRegenZone(true);
+            main.getLogger().info("La generación de pequeñas islas del End está desactivada en la configuración.");
+            return;
+        }
         if (!Main.worldEditFound) {
             main.getLogger().warning("No se pueden generar las modificaciones del End porque WorldEdit/FAWE no está disponible.");
             return;
