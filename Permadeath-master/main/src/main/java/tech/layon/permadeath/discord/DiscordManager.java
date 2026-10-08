@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -65,24 +67,28 @@ public class DiscordManager {
             JDABuilder builder = JDABuilder.createDefault(token);
             builder.setActivity(Activity.watching(
                     Objects.requireNonNullElse(configuration.getString("Status"), "¡Permadeath!")));
+            builder.addEventListeners(new ListenerAdapter() {
+                @Override
+                public void onReady(ReadyEvent event) {
+                    Bukkit.getScheduler().runTask(instance, () -> {
+                        if (bot == null) return;
+                        String channelId = configuration.getString("Channels.Anuncios");
+                        if (channelId == null || channelId.isBlank()) return;
+                        TextChannel channel = bot.getTextChannelById(channelId);
+                        if (channel != null) {
+                            sendEmbed(channel, buildEmbed(
+                                    "Permadeath",
+                                    Color.GREEN,
+                                    null,
+                                    null,
+                                    null,
+                                    ":gear: Plugin encendido."));
+                        }
+                    });
+                }
+            });
 
             this.bot = builder.build();
-
-            Bukkit.getScheduler().runTaskLater(instance, () -> {
-                if (bot == null) return;
-                String channelId = configuration.getString("Channels.Anuncios");
-                if (channelId == null || channelId.isBlank()) return;
-                TextChannel channel = bot.getTextChannelById(channelId);
-                if (channel != null) {
-                    sendEmbed(channel, buildEmbed(
-                            "Permadeath",
-                            Color.GREEN,
-                            null,
-                            null,
-                            null,
-                            ":gear: Plugin encendido."));
-                }
-            }, 20L);
         } catch (Exception ex) {
             log("Ha ocurrido un error al iniciar sesión con la aplicación de Discord, revisa tu token.");
             ex.printStackTrace();
