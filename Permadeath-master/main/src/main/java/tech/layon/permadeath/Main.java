@@ -919,7 +919,11 @@ public final class Main extends JavaPlugin implements Listener {
             logger.addFilter(rootLogFilter);
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
             removeConsoleFilter();
-            legacyLogFilter = new Log4JFilter();
+            legacyLogFilter = record -> {
+                String message = record == null ? "" : String.valueOf(record.getMessage());
+                return !message.contains("Ignoring unknown attribute")
+                        && !message.contains("Summoned new Wither");
+            };
             Bukkit.getLogger().setFilter(legacyLogFilter);
             Logger.getLogger("Minecraft").setFilter(legacyLogFilter);
         }
