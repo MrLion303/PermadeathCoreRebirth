@@ -5,6 +5,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import tech.layon.permadeath.Main;
 import tech.layon.permadeath.util.Utils;
 import tech.layon.permadeath.util.VersionManager;
@@ -32,7 +33,23 @@ public class HostileEntityListener implements Listener {
         }
     }
 
-    // Los mobs existentes no se reprocesan al cargar chunks.
-    // Solo CreatureSpawnEvent aplica la dificultad al mob recién creado.
+    /** Aplica la conversión hostil a entidades que ya existían cuando cambió el día. */
+    public void applyToExisting(LivingEntity entity) {
+        if (entity == null || entity.isDead() || instance.getDay() < 20) return;
+        if (Utils.isHostileMob(entity.getType())
+                || entity.getType() == EntityType.ARMOR_STAND
+                || entity.getType() == EntityType.ENDERMAN) return;
+        injectHostileBehavior(entity);
+    }
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent event) {
+        if (instance.getDay() < 20) return;
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (entity instanceof LivingEntity living) {
+                applyToExisting(living);
+            }
+        }
+    }
 }
 
