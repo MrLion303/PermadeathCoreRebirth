@@ -17,7 +17,6 @@ import java.util.SplittableRandom;
 
 public class BeginningGenerator extends ChunkGenerator {
     private static final int HEIGHT = 100;
-    private static final boolean SMALL_ISLANDS_ENABLED = Main.getInstance().isSmallIslandsEnabled();
     private final SplittableRandom random = new SplittableRandom();
 
     @Override
@@ -33,7 +32,7 @@ public class BeginningGenerator extends ChunkGenerator {
                         0.5D, 0.5D) * 15);
 
                 if (noise <= 0) {
-                    if (Main.worldEditFound && SMALL_ISLANDS_ENABLED && X == 8 && Z == 8)
+                    if (Main.worldEditFound && Main.getInstance().isSmallIslandsEnabled() && X == 8 && Z == 8)
                         if (random.nextInt(20) == 0) {
                             int finalX = X;
                             int finalZ = Z;
