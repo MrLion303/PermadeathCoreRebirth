@@ -83,6 +83,15 @@ public class EndDataManager {
         return timeList;
     }
 
+    public boolean isIslandGenerated(int index) {
+        return config.getBoolean("GeneratedIsland." + index, false);
+    }
+
+    public void setIslandGenerated(int index, boolean value) {
+        config.set("GeneratedIsland." + index, value);
+        saveFile();
+    }
+
     public boolean isCreatedRegenZone() {
         return config.getBoolean("CreatedRegenZone", false);
     }
