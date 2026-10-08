@@ -105,6 +105,7 @@ public final class Main extends JavaPlugin implements Listener {
     private Listener paperListeners;
     private boolean beginningWarningShown = false;
     private int witherTimer = 0;
+    private int eventTickAccumulator = 0;
     private org.apache.logging.log4j.core.Filter rootLogFilter;
     private Filter legacyLogFilter;
 
@@ -472,10 +473,17 @@ public final class Main extends JavaPlugin implements Listener {
 
     private void tickEvents() {
 
+        // tickAll se ejecuta cada 30 ticks (~1.5 s). Los eventos guardan segundos,
+        // así que acumulamos ticks para que sus relojes avancen a tiempo real.
+        eventTickAccumulator += 30;
+        int elapsedSeconds = eventTickAccumulator / 20;
+        eventTickAccumulator %= 20;
+        if (elapsedSeconds <= 0) return;
+
         if (this.orbEvent.isRunning()) {
             if (this.orbEvent.getTimeLeft() > 0) {
 
-                this.orbEvent.reduceTime();
+                this.orbEvent.setTimeLeft(Math.max(0, this.orbEvent.getTimeLeft() - elapsedSeconds));
 
                 int res = this.orbEvent.getTimeLeft();
 
@@ -506,7 +514,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             if (this.shulkerEvent.getTimeLeft() > 0) {
 
-                this.shulkerEvent.setTimeLeft(this.shulkerEvent.getTimeLeft() - 1);
+                this.shulkerEvent.setTimeLeft(Math.max(0, this.shulkerEvent.getTimeLeft() - elapsedSeconds));
 
                 int res = this.shulkerEvent.getTimeLeft();
 
@@ -847,6 +855,7 @@ public final class Main extends JavaPlugin implements Listener {
         if (this.recipes != null) {
             this.recipes.unregisterRecipesAboveDay(getDay());
         }
+        this.eventTickAccumulator = 0;
 
         sender.sendMessage(TextUtils.format("&aSe ha recargado el archivo de configuración y los mensajes."));
         sender.sendMessage(TextUtils.format("&eAlgunos cambios pueden requerir un reinicio para funcionar correctamente."));
