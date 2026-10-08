@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -99,6 +100,9 @@ public final class Main extends JavaPlugin implements Listener {
     private LifeOrbEvent orbEvent;
     private SpawnListener spawnListener;
     private DifficultyChanges difficultyChanges;
+    private PlayerListener playerListener;
+    private Listener slotBlockListener;
+    private Listener paperListeners;
     private boolean beginningWarningShown = false;
     private int witherTimer = 0;
     private org.apache.logging.log4j.core.Filter rootLogFilter;
@@ -660,7 +664,8 @@ public final class Main extends JavaPlugin implements Listener {
                 registeredDays.replace(30, true);
 
                 if (runningPaperSpigot) {
-                    getServer().getPluginManager().registerEvents(new PaperListeners(instance), instance);
+                    this.paperListeners = new PaperListeners(instance);
+                    getServer().getPluginManager().registerEvents(this.paperListeners, instance);
                     Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios especiales para &c&lPaperMC&e."));
                 }
             }
@@ -686,7 +691,8 @@ public final class Main extends JavaPlugin implements Listener {
                 if (this.recipes == null) this.recipes = new RecipeManager(this);
                 this.recipes.registerRecipes();
                 this.getNmsHandler().addMushrooms();
-                getServer().getPluginManager().registerEvents(new SlotBlockListener(instance), instance);
+                this.slotBlockListener = new SlotBlockListener(instance);
+                getServer().getPluginManager().registerEvents(this.slotBlockListener, instance);
 
                 this.beData = new BeginningDataManager(this);
                 this.begginingManager = new BeginningManager(this);
@@ -822,6 +828,11 @@ public final class Main extends JavaPlugin implements Listener {
         this.messages.reloadFiles();
         DateManager.getInstance().reloadDate();
         setupWorld();
+        resetDaySystems();
+        registerListeners();
+        if (this.recipes != null) {
+            this.recipes.unregisterRecipesAboveDay(getDay());
+        }
 
         sender.sendMessage(TextUtils.format("&aSe ha recargado el archivo de configuración y los mensajes."));
         sender.sendMessage(TextUtils.format("&eAlgunos cambios pueden requerir un reinicio para funcionar correctamente."));
@@ -832,13 +843,55 @@ public final class Main extends JavaPlugin implements Listener {
         DiscordPortal.reload();
     }
 
+    private void resetDaySystems() {
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+
+        if (hostile != null) {
+            HandlerList.unregisterAll(hostile);
+            hostile = null;
+        }
+        if (endManager != null) {
+            HandlerList.unregisterAll(endManager);
+            endManager = null;
+        }
+        if (paperListeners != null) {
+            HandlerList.unregisterAll(paperListeners);
+            paperListeners = null;
+        }
+        if (slotBlockListener != null) {
+            HandlerList.unregisterAll(slotBlockListener);
+            slotBlockListener = null;
+        }
+        if (begginingManager != null) {
+            HandlerList.unregisterAll(begginingManager);
+            begginingManager = null;
+        }
+        if (playerListener != null) {
+            HandlerList.unregisterAll(playerListener);
+            playerListener = new PlayerListener();
+            getServer().getPluginManager().registerEvents(playerListener, instance);
+        }
+
+        endData = null;
+        beginningWarningShown = false;
+        registeredDays.replace(20, false);
+        registeredDays.replace(30, false);
+        registeredDays.replace(40, false);
+        registeredDays.replace(50, false);
+        registeredDays.replace(60, false);
+    }
+
     private void setupListeners() {
         getServer().getPluginManager().registerEvents(this, this);
 
         this.spawnListener = new SpawnListener(this);
         getServer().getPluginManager().registerEvents(spawnListener, instance);
         getServer().getPluginManager().registerEvents(new CustomSkeletons(instance), instance);
-        getServer().getPluginManager().registerEvents(new PlayerListener(), instance);
+        this.playerListener = new PlayerListener();
+        getServer().getPluginManager().registerEvents(this.playerListener, instance);
         getServer().getPluginManager().registerEvents(new BlockListener(), instance);
         getServer().getPluginManager().registerEvents(new EntityEvents(), instance);
         getServer().getPluginManager().registerEvents(new TotemListener(), instance);
