@@ -412,7 +412,7 @@ public final class Main extends JavaPlugin implements Listener {
                         getDoneEffectPlayers().add(player);
                     }
 
-                    if (e.getDuration() == 4 * 60 * 20 - 1 && getDoneEffectPlayers().contains(player)) {
+                    if (e.getDuration() <= 4 * 60 * 20 && getDoneEffectPlayers().contains(player)) {
                         getDoneEffectPlayers().remove(player);
                     }
                 }
