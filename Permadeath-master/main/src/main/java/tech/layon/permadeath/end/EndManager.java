@@ -70,40 +70,23 @@ public class EndManager implements Listener {
 
     private void replaceEndPillarsWithBedrock(EndDataManager data) {
         World end = main.endWorld;
-        int radius = 64;
-        int minX = -radius;
-        int maxX = radius;
-        int minZ = -radius;
-        int maxZ = radius;
+        int[][] pillarCenters = {
+                {0, 42}, {26, 35}, {42, 25}, {42, -13}, {25, -35},
+                {0, -42}, {-25, -35}, {-42, -25}, {-42, 13}, {-26, 35}
+        };
+
         int minY = Math.max(end.getMinHeight(), 0);
         int maxY = Math.min(end.getMaxHeight() - 1, 180);
         int replaced = 0;
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                if ((x * x) + (z * z) > radius * radius) {
-                    continue;
-                }
-
-                int columnObsidian = 0;
-                for (int y = minY; y <= maxY; y++) {
-                    if (end.getBlockAt(x, y, z).getType() == Material.OBSIDIAN) {
-                        columnObsidian++;
-                    }
-                }
-
-                // Los pilares vanilla son columnas verticales; no convertimos
-                // pequeñas estructuras de obsidiana ajenas al sistema.
-                if (columnObsidian < 3) {
-                    continue;
-                }
-
-                for (int y = minY; y <= maxY; y++) {
-                    Block block = end.getBlockAt(x, y, z);
-                    if (block.getType() == Material.OBSIDIAN) {
-                        block.setType(Material.BEDROCK, false);
-                        replaced++;
-                    }
+        for (int[] center : pillarCenters) {
+            int x = center[0];
+            int z = center[1];
+            for (int y = minY; y <= maxY; y++) {
+                Block block = end.getBlockAt(x, y, z);
+                if (block.getType() == Material.OBSIDIAN) {
+                    block.setType(Material.BEDROCK, false);
+                    replaced++;
                 }
             }
         }
