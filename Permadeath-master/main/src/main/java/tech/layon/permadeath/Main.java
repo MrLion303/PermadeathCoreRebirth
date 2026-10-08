@@ -15,6 +15,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -841,6 +842,33 @@ public final class Main extends JavaPlugin implements Listener {
         DiscordPortal.reload();
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void blockBeginningBeforeDay50(PlayerTeleportEvent event) {
+        if (event.getCause() != PlayerTeleportEvent.TeleportCause.END_GATEWAY || getDay() >= 50) {
+            return;
+        }
+
+        World beginningWorld = Bukkit.getWorld("pdc_the_beginning");
+        Player player = event.getPlayer();
+        boolean fromBeginning = beginningWorld != null && player.getWorld().equals(beginningWorld);
+        boolean fromMainWorld = player.getWorld().equals(this.world);
+        boolean goingToBeginning = event.getTo() != null
+                && beginningWorld != null
+                && event.getTo().getWorld() != null
+                && event.getTo().getWorld().equals(beginningWorld);
+
+        if (!fromBeginning && !fromMainWorld && !goingToBeginning) {
+            return;
+        }
+
+        event.setCancelled(true);
+        player.setNoDamageTicks(player.getMaximumNoDamageTicks());
+        player.damage(player.getHealth() + 1.0D);
+        player.setNoDamageTicks(0);
+        Bukkit.broadcastMessage(TextUtils.format("&c&lEl jugador &4&l" + player.getName()
+                + " &c&lintentó entrar a TheBeginning antes del día 50."));
+    }
+
     private void resetDaySystems() {
         if (task != null) {
             task.cancel();
@@ -866,6 +894,17 @@ public final class Main extends JavaPlugin implements Listener {
         if (begginingManager != null) {
             HandlerList.unregisterAll(begginingManager);
             begginingManager = null;
+        }
+
+        // The Beginning permanece en el mundo aunque bajemos de día, pero no
+        // puede quedar ningún jugador dentro cuando el acceso está bloqueado.
+        if (getDay() < 50) {
+            World beginningWorld = Bukkit.getWorld("pdc_the_beginning");
+            if (beginningWorld != null && world != null) {
+                for (Player player : new ArrayList<>(beginningWorld.getPlayers())) {
+                    player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                }
+            }
         }
         if (playerListener != null) {
             HandlerList.unregisterAll(playerListener);
