@@ -15,149 +15,110 @@ import java.util.Objects;
 
 public class TotemListener implements Listener {
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void totemNerf(EntityResurrectEvent event) {
+        if (!(event.getEntity() instanceof Player p)) return;
 
-        if (!(event.getEntity() instanceof Player)) return;
+        ItemStack mainHand = p.getInventory().getItemInMainHand();
+        ItemStack offHand = p.getInventory().getItemInOffHand();
+        if ((mainHand == null || mainHand.getType() != Material.TOTEM_OF_UNDYING)
+                && (offHand == null || offHand.getType() != Material.TOTEM_OF_UNDYING)) {
+            return;
+        }
 
-        if (((Player) event.getEntity()).getInventory().getItemInMainHand().getType() == Material.TOTEM_OF_UNDYING || ((Player) event.getEntity()).getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING) {
+        Main plugin = Main.getInstance();
+        if (!plugin.getConfig().getBoolean("TotemFail.Enable")) return;
 
-            if (!Main.instance.getConfig().getBoolean("TotemFail.Enable")) return;
+        int day = plugin.getDay();
+        String sectionPath = "TotemFail.FailProbs." + day;
+        if (!plugin.getConfig().contains(sectionPath)) return;
 
-            Player p = (Player) event.getEntity();
-            String player = p.getName();
+        int failProb = Math.max(0, Math.min(100, plugin.getConfig().getInt(sectionPath)));
+        String player = p.getName();
+        String totemFail = plugin.getConfig().getString("TotemFail.ChatMessage", "&7¡El tótem de &c%player% &7ha fallado!");
+        String totemMessage = plugin.getConfig().getString("TotemFail.PlayerUsedTotemMessage", "&7El jugador %player% ha consumido un tótem.");
+        String medalMessage = plugin.getConfig().getString("TotemFail.Medalla", "&7¡El jugador %player% ha usado su medalla de superviviente!");
 
-            int failProb = 0;
-            boolean containsDay;
+        boolean specialTotem = doPlayerHaveSpecialTotem(p);
+        int neededTotems = day >= 60 ? 3 : (day >= 40 ? 2 : 1);
 
-            if (Main.getInstance().getConfig().contains("TotemFail.FailProbs." + Main.getInstance().getDay())) {
-                failProb = Objects.requireNonNull(Objects.requireNonNull(Main.instance.getConfig().getInt("TotemFail.FailProbs." + Main.getInstance().getDay())));
-                containsDay = true;
-            } else {
-                System.out.println("[INFO] La probabilidad del tótem se encuentra desactivada para el día: " + Main.getInstance().getDay());
-                containsDay = false;
+        if (specialTotem) {
+            Bukkit.broadcastMessage(TextUtils.format(medalMessage.replace("%player%", player)));
+            return;
+        }
+
+        int availableTotems = countTotems(p);
+        if (availableTotems < neededTotems) {
+            String notEnough = plugin.getConfig().getString(
+                    "TotemFail.NotEnoughTotems",
+                    "&7¡%player% no tenía suficientes tótems en el inventario!");
+            Bukkit.broadcastMessage(TextUtils.format(notEnough.replace("%player%", player)));
+            event.setCancelled(true);
+            return;
+        }
+
+        int roll = (int) (Math.random() * 100) + 1;
+        boolean failed = failProb >= 100 || roll > (100 - failProb);
+
+        String comparison = failed ? "=" : "!=";
+        int shown = failed ? failProb : roll;
+        Bukkit.broadcastMessage(TextUtils.format(
+                totemMessage.replace("%player%", player)
+                        .replace("%porcent%", comparison)
+                        .replace("%totem_fail%", String.valueOf(shown))
+                        .replace("%number%", String.valueOf(failProb))));
+
+        if (failed) {
+            removeTotems(p, neededTotems);
+            Bukkit.broadcastMessage(TextUtils.format(totemFail.replace("%player%", player)));
+            event.setCancelled(true);
+            return;
+        }
+
+        // Bukkit consumirá el tótem que activa el evento; retiramos solo los adicionales.
+        removeTotems(p, Math.max(0, neededTotems - 1));
+        if (neededTotems > 1) {
+            String multi = plugin.getConfig().getString(
+                    "TotemFail.ChatMessageTotems",
+                    "&7¡Los tótems de &c%player% &7han sido consumidos!");
+            Bukkit.broadcastMessage(TextUtils.format(multi.replace("%player%", player)));
+        }
+    }
+
+    private int countTotems(Player p) {
+        int total = 0;
+        for (ItemStack item : p.getInventory().getContents()) {
+            if (item != null && item.getType() == Material.TOTEM_OF_UNDYING) {
+                total += item.getAmount();
             }
+        }
+        ItemStack off = p.getInventory().getItemInOffHand();
+        if (off != null && off.getType() == Material.TOTEM_OF_UNDYING) {
+            // getContents() ya incluye el offhand en Bukkit; no duplicarlo.
+        }
+        return total;
+    }
 
-            String totemFail = Objects.requireNonNull(Main.instance.getConfig().getString("TotemFail.ChatMessage"));
-            String totemMessage = Objects.requireNonNull(Main.instance.getConfig().getString("TotemFail.PlayerUsedTotemMessage"));
+    private void removeTotems(Player p, int amount) {
+        int remaining = amount;
+        if (remaining <= 0) return;
 
-            if (Main.getInstance().getDay() >= 40) {
-                if (Main.getInstance().getDay() < 60) {
-                    totemMessage = Objects.requireNonNull(Main.instance.getConfig().getString("TotemFail.PlayerUsedTotemsMessage").replace("{ammount}", "dos").replace("%player%", player));
-                } else {
-                    totemMessage = Objects.requireNonNull(Main.instance.getConfig().getString("TotemFail.PlayerUsedTotemsMessage").replace("{ammount}", "tres").replace("%player%", player));
-                }
-            }
+        ItemStack off = p.getInventory().getItemInOffHand();
+        if (off != null && off.getType() == Material.TOTEM_OF_UNDYING && remaining > 0) {
+            int take = Math.min(remaining, off.getAmount());
+            off.setAmount(off.getAmount() - take);
+            if (off.getAmount() <= 0) p.getInventory().setItemInOffHand(null);
+            remaining -= take;
+        }
 
-
-            for (String k : Main.instance.getConfig().getConfigurationSection("TotemFail.FailProbs").getKeys(false)) {
-                try {
-                    int i = Integer.valueOf(k);
-                    if (i == Main.getInstance().getDay()) {
-                        containsDay = true;
-                    }
-
-                } catch (NumberFormatException e) {
-                    System.out.println("[ERROR] Ha ocurrido un error al cargar la probabilidad de tótem del día '" + k + "'");
-                }
-            }
-
-            if (!containsDay) return;
-
-            if (failProb >= 101) failProb = 100;
-            if (failProb < 0) failProb = 1;
-
-            if (failProb == 100) {
-                Bukkit.broadcastMessage(TextUtils.format(totemMessage.replace("%player%", player).replace("%porcent%", "=").replace("%totem_fail%", String.valueOf(100)).replace("%number%", String.valueOf(failProb))));
-                Bukkit.broadcastMessage(TextUtils.format(totemFail.replace("%player%", player)));
-                event.setCancelled(true);
-            } else {
-
-                int random = (int) (Math.random() * 100) + 1;
-
-                int resta = 100 - failProb;
-                int toShow = resta;
-
-                if (resta == random) toShow = toShow - 1;
-
-                int raShow = random;
-
-                if (random == resta) raShow = raShow - 1;
-
-                if (Main.instance.getDay() < 40) {
-
-                    if (doPlayerHaveSpecialTotem(p)) {
-                        ItemStack s = getTotem(p);
-                        p.getInventory().removeItem(s);
-                        Bukkit.broadcastMessage(TextUtils.format(Main.instance.getConfig().getString("TotemFail.Medalla").replace("%player%", p.getName())));
-                        return;
-                    }
-
-                    if (random > resta) {
-                        Bukkit.broadcastMessage(TextUtils.format(totemMessage.replace("%player%", player).replace("%porcent%", "=").replace("%totem_fail%", String.valueOf(toShow)).replace("%number%", String.valueOf(resta))));
-                        Bukkit.broadcastMessage(TextUtils.format(totemFail.replace("%player%", player)));
-                        event.setCancelled(true);
-                    } else {
-                        Bukkit.broadcastMessage(TextUtils.format(totemMessage.replace("%player%", player).replace("%porcent%", "!=").replace("%totem_fail%", String.valueOf(raShow)).replace("%number%", String.valueOf(resta))));
-                    }
-                } else {
-                    int neededTotems = (Main.instance.getDay() < 60 ? 2 : 3);
-                    int totems = p.getInventory().all(Material.TOTEM_OF_UNDYING).size();
-
-                    if (p.getInventory().getItemInOffHand() != null && p.getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING)
-                        totems++;
-
-                    int removedTotems = 0;
-                    boolean hasTotem = doPlayerHaveSpecialTotem(p);
-
-                    if (hasTotem) {
-                        ItemStack s = getTotem(p);
-
-                        if (getSpecialTotem(p) == EnumPlayerTotemSlot.OFF_HAND) {
-                            p.getInventory().setItemInOffHand(null);
-                        } else {
-                            p.getInventory().removeItem(s);
-                        }
-                        removedTotems++;
-                    } else {
-                        if (p.getInventory().getItemInOffHand() != null && p.getInventory().getItemInOffHand().getType() == Material.TOTEM_OF_UNDYING) {
-                            p.getInventory().setItemInOffHand(null);
-                            removedTotems++;
-                        }
-                    }
-
-                    for (ItemStack s : p.getInventory().getContents()) {
-                        if (s != null) {
-                            if (s.getType() == Material.TOTEM_OF_UNDYING) {
-                                if (removedTotems < neededTotems) {
-                                    p.getInventory().removeItem(s);
-                                    removedTotems++;
-                                }
-                            }
-                        }
-                    }
-
-                    if (totems < neededTotems) {
-                        Bukkit.broadcastMessage(TextUtils.format(Main.instance.getConfig().getString("TotemFail.NotEnoughTotems").replace("%player%", player).replace("%porcent%", "=").replace("%totem_fail%", String.valueOf(toShow)).replace("%number%", String.valueOf(resta))));
-                        event.setCancelled(true);
-                        return;
-                    }
-
-                    if (hasTotem) {
-                        Bukkit.broadcastMessage(TextUtils.format(Main.instance.getConfig().getString("TotemFail.Medalla").replace("%player%", p.getName())));
-                        return;
-                    }
-
-                    if (random > resta) {
-                        Bukkit.broadcastMessage(TextUtils.format(totemMessage.replace("%player%", player).replace("%porcent%", "=").replace("%totem_fail%", String.valueOf(toShow)).replace("%number%", String.valueOf(resta))));
-                        Bukkit.broadcastMessage(TextUtils.format(Main.instance.getConfig().getString("TotemFail.ChatMessageTotems").replace("%player%", player)));
-                        event.setCancelled(true);
-                    } else {
-
-                        Bukkit.broadcastMessage(TextUtils.format(totemMessage.replace("%player%", player).replace("%porcent%", "!=").replace("%totem_fail%", String.valueOf(raShow)).replace("%number%", String.valueOf(resta))));
-                    }
-                }
-            }
+        if (remaining <= 0) return;
+        for (int slot = 0; slot < p.getInventory().getStorageContents().length && remaining > 0; slot++) {
+            ItemStack item = p.getInventory().getItem(slot);
+            if (item == null || item.getType() != Material.TOTEM_OF_UNDYING) continue;
+            int take = Math.min(remaining, item.getAmount());
+            item.setAmount(item.getAmount() - take);
+            if (item.getAmount() <= 0) p.getInventory().setItem(slot, null);
+            remaining -= take;
         }
     }
 
