@@ -498,7 +498,7 @@ public final class DifficultyChanges implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerResurrect(EntityResurrectEvent event) {
         if (!(event.getEntity() instanceof Player player)) {
             return;
