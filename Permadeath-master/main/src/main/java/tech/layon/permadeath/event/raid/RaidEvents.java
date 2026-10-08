@@ -8,7 +8,6 @@ import org.bukkit.event.raid.RaidFinishEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import tech.layon.permadeath.Main;
-import tech.layon.permadeath.event.DifficultyChanges;
 import tech.layon.permadeath.event.LegacyCleanupListener;
 import tech.layon.permadeath.event.player.PlayerDeathSkullListener;
 import tech.layon.permadeath.event.spigot.SpigotCompatibilityListener;
@@ -27,12 +26,6 @@ public class RaidEvents implements Listener {
          * originalmente dependian de eventos exclusivos de Paper.
          */
         ServerPlatform.bootstrap(plugin);
-
-        plugin.getServer().getPluginManager().registerEvents(
-                new DifficultyChanges(plugin),
-                plugin
-        );
-
         plugin.getServer().getPluginManager().registerEvents(
                 new LegacyCleanupListener(plugin),
                 plugin
