@@ -119,7 +119,16 @@ public class EndTask extends BukkitRunnable {
                 continue;
             }
 
-            loc.getWorld().spawnEntity(loc, EntityType.END_CRYSTAL);
+            boolean crystalAlreadyPresent = false;
+            for (Entity nearby : loc.getWorld().getNearbyEntities(loc, 0.5D, 1.5D, 0.5D)) {
+                if (nearby.getType() == EntityType.END_CRYSTAL) {
+                    crystalAlreadyPresent = true;
+                    break;
+                }
+            }
+            if (!crystalAlreadyPresent) {
+                loc.getWorld().spawnEntity(loc, EntityType.END_CRYSTAL);
+            }
         }
     }
 
