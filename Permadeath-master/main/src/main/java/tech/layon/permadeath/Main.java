@@ -639,9 +639,10 @@ public final class Main extends JavaPlugin implements Listener {
         if (DateManager.getInstance().getDay() >= 30 && endManager == null && endData == null && !registeredDays.get(30)) {
             registeredDays.replace(30, true);
 
-            this.endManager = new EndManager(instance);
-
             this.endData = new EndDataManager(instance);
+            this.endManager = new EndManager(instance);
+            getServer().getPluginManager().registerEvents(this.endManager, instance);
+            this.endManager.prepareEnd(this.endData);
 
             if (runningPaperSpigot) {
                 getServer().getPluginManager().registerEvents(new PaperListeners(instance), instance);
