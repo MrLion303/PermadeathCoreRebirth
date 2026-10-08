@@ -71,7 +71,7 @@ public class DateManager {
 
         try {
             int d = Integer.parseInt(args1);
-            if (d > 120 || d < 0) {
+            if (d > 60 || d < 1) {
                 nD = 0;
             } else {
                 nD = d;
