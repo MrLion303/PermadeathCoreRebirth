@@ -25,6 +25,7 @@ import tech.layon.permadeath.util.TextUtils;
 import tech.layon.permadeath.world.WorldEditPortal;
 import tech.layon.permadeath.world.beginning.generator.BeginningGenerator;
 import tech.layon.permadeath.world.beginning.generator.BeginningLootTable;
+import java.util.ArrayList;
 
 public class BeginningManager implements Listener {
 
