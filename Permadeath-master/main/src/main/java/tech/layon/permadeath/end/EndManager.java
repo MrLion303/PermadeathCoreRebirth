@@ -19,6 +19,8 @@ import tech.layon.permadeath.Main;
 import tech.layon.permadeath.util.TextUtils;
 import tech.layon.permadeath.end.demon.DemonPhase;
 import tech.layon.permadeath.task.EndTask;
+import tech.layon.permadeath.data.EndDataManager;
+import tech.layon.permadeath.world.WorldEditPortal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,98 @@ public class EndManager implements Listener {
         this.enderCreepers = new ArrayList<>();
         this.enderGhasts = new ArrayList<>();
         this.random = new SplittableRandom();
+    }
+
+    /**
+     * Prepara físicamente el End cuando comienza su etapa del plugin.
+     * La operación es persistente para no volver a modificar un mundo ya preparado.
+     */
+    public void prepareEnd(EndDataManager data) {
+        if (main.endWorld == null || data == null || main.getDay() < 30) {
+            return;
+        }
+
+        if (!data.isReplacedObsidian()) {
+            replaceEndPillarsWithBedrock(data);
+        }
+
+        if (!data.isCreatedRegenZone()) {
+            generateEndIslands(data);
+        }
+    }
+
+    private void replaceEndPillarsWithBedrock(EndDataManager data) {
+        World end = main.endWorld;
+        int radius = 64;
+        int minX = -radius;
+        int maxX = radius;
+        int minZ = -radius;
+        int maxZ = radius;
+        int minY = Math.max(end.getMinHeight(), 0);
+        int maxY = Math.min(end.getMaxHeight() - 1, 180);
+        int replaced = 0;
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                if ((x * x) + (z * z) > radius * radius) {
+                    continue;
+                }
+
+                int columnObsidian = 0;
+                for (int y = minY; y <= maxY; y++) {
+                    if (end.getBlockAt(x, y, z).getType() == Material.OBSIDIAN) {
+                        columnObsidian++;
+                    }
+                }
+
+                // Los pilares vanilla son columnas verticales; no convertimos
+                // pequeñas estructuras de obsidiana ajenas al sistema.
+                if (columnObsidian < 3) {
+                    continue;
+                }
+
+                for (int y = minY; y <= maxY; y++) {
+                    Block block = end.getBlockAt(x, y, z);
+                    if (block.getType() == Material.OBSIDIAN) {
+                        block.setType(Material.BEDROCK, false);
+                        replaced++;
+                    }
+                }
+            }
+        }
+
+        data.setReplacedObsidian(true);
+        main.getLogger().info("End preparado: " + replaced + " bloques de obsidiana de los pilares fueron convertidos a bedrock.");
+    }
+
+    private void generateEndIslands(EndDataManager data) {
+        if (!Main.worldEditFound) {
+            main.getLogger().warning("No se pueden generar las modificaciones del End porque WorldEdit/FAWE no está disponible.");
+            return;
+        }
+
+        World end = main.endWorld;
+        int[][] positions = {
+                { 28, 0 }, { -28, 0 }, { 0, 28 }, { 0, -28 },
+                { 22, 22 }, { -22, 22 }, { 22, -22 }, { -22, -22 }
+        };
+        int generated = 0;
+
+        for (int[] position : positions) {
+            int x = position[0];
+            int z = position[1];
+            int surfaceY = end.getHighestBlockYAt(x, z);
+            if (surfaceY < 0) {
+                surfaceY = 64;
+            }
+
+            // generateIsland coloca el schematic 20 bloques sobre la altura recibida.
+            WorldEditPortal.generateIsland(end, x, z, Math.max(0, surfaceY - 20), random);
+            generated++;
+        }
+
+        data.setCreatedRegenZone(true);
+        main.getLogger().info("End preparado: se generaron " + generated + " zonas/islas decorativas alrededor de la isla principal.");
     }
 
     @EventHandler
@@ -490,8 +584,10 @@ public class EndManager implements Listener {
     }
 
     public boolean isInEnd(Location p) {
-
-        return p.getWorld().getName().endsWith("_the_end");
+        return p != null
+                && p.getWorld() != null
+                && main.endWorld != null
+                && p.getWorld().equals(main.endWorld);
     }
 }
 
