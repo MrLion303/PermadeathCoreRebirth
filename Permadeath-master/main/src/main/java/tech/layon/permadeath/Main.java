@@ -181,14 +181,10 @@ public final class Main extends JavaPlugin implements Listener {
                         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&eSi no puedes descargarlo allí, únete a este Discord y te daremos acceso al enlace: &ehttps://discord.gg/nKxBA7qzAU"));
                     }
 
-                    // Completa las claves que falten antes de arrancar los sistemas que leen la configuración.
-                    setupConfig();
+                    // Valida la versión antes de completar claves para no convertir una config antigua en "válida" accidentalmente.
                     reloadConfig();
-
-                    boolean resetConfig = false;
-                    if (!getConfig().contains("config-version")) {
-                        resetConfig = true;
-                    } else {
+                    boolean resetConfig = !getConfig().contains("config-version");
+                    if (!resetConfig) {
                         try {
                             resetConfig = getConfig().getInt("config-version") != CURRENT_CONFIG_VERSION;
                         } catch (Exception ignored) {
@@ -204,6 +200,9 @@ public final class Main extends JavaPlugin implements Listener {
                         reloadConfig();
                     }
 
+                    // Completa las claves que falten antes de arrancar los sistemas que leen la configuración.
+                    setupConfig();
+                    reloadConfig();
                     startPlugin();
 
                     if (getConfig().getBoolean("Toggles.Replace-Mobs-On-Chunk-Load")) {
