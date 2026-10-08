@@ -134,12 +134,17 @@ public class EndManager implements Listener {
             }
 
             // generateIsland coloca el schematic 20 bloques sobre la altura recibida.
-            WorldEditPortal.generateIsland(end, x, z, Math.max(0, surfaceY - 20), random);
-            generated++;
+            if (WorldEditPortal.generateIsland(end, x, z, Math.max(0, surfaceY - 20), random)) {
+                generated++;
+            }
         }
 
-        data.setCreatedRegenZone(true);
-        main.getLogger().info("End preparado: se generaron " + generated + " zonas/islas decorativas alrededor de la isla principal.");
+        if (generated == positions.length) {
+            data.setCreatedRegenZone(true);
+            main.getLogger().info("End preparado: se generaron " + generated + " zonas/islas decorativas alrededor de la isla principal.");
+        } else {
+            main.getLogger().warning("La preparación del End quedó incompleta (" + generated + "/" + positions.length + " islas). Se volverá a intentar.");
+        }
     }
 
     @EventHandler
