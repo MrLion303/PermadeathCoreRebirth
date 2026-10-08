@@ -19,22 +19,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detectar proyecto
-        shell: bash
-        run: |
-          set -e
-          echo "=== ESTRUCTURA DEL REPOSITORIO ==="
-          find . -maxdepth 4 -type f -not -path './.git/*' | sort
-
-          if [ ! -f "Permadeath-master/pom.xml" ]; then
-            echo "::error::No se encontró Permadeath-master/pom.xml"
-            exit 1
-          fi
-
-          echo "Proyecto Maven detectado en Permadeath-master"
-
       - name: Configurar Java 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
@@ -42,10 +28,31 @@ jobs:
           cache-dependency-path: Permadeath-master/pom.xml
 
       - name: Mostrar versiones
-        shell: bash
         run: |
           java -version
           mvn -version
+
+      - name: Preparar Spigot 26.3
+        working-directory: Permadeath-master
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "Comprobando si Spigot 26.3 ya está instalado..."
+          if mvn -q dependency:get             -Dartifact=org.spigotmc:spigot:26.3-R0.1-SNAPSHOT             -Dtransitive=false; then
+            echo "Spigot 26.3 ya está disponible."
+            exit 0
+          fi
+
+          echo "Spigot 26.3 no está publicado en los repositorios Maven."
+          echo "Construyendo Spigot 26.3 mediante BuildTools..."
+
+          curl -fsSL             "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"             -o BuildTools.jar
+
+          java -jar BuildTools.jar --rev 26.3 --compile SPIGOT
+
+          echo "Comprobando artefacto generado..."
+          mvn -q dependency:get             -Dartifact=org.spigotmc:spigot:26.3-R0.1-SNAPSHOT             -Dtransitive=false
 
       - name: Compilar proyecto
         working-directory: Permadeath-master
