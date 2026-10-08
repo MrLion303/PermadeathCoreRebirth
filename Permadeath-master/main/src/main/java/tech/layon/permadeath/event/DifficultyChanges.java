@@ -307,9 +307,21 @@ public final class DifficultyChanges implements Listener {
         }
         if (day < 15) {
             restoreAttribute(entity, batAttackOriginalKey);
+            if (entity instanceof Bat bat) {
+                AttributeInstance attack = bat.getAttribute(Attribute.ATTACK_DAMAGE);
+                if (attack != null && attack.getBaseValue() == 20.0D) attack.setBaseValue(3.0D);
+            }
         }
         if (day < 35) {
             restoreAttribute(entity, dragonHealthOriginalKey);
+            if (entity instanceof EnderDragon dragon) {
+                AttributeInstance maxHealth = dragon.getAttribute(Attribute.MAX_HEALTH);
+                double configured = plugin.getConfig().getDouble("Toggles.End.PermadeathDemon.Health", 200.0D);
+                if (maxHealth != null && maxHealth.getBaseValue() > configured && maxHealth.getBaseValue() <= configured * 1.51D) {
+                    maxHealth.setBaseValue(configured);
+                    dragon.setHealth(Math.min(dragon.getHealth(), configured));
+                }
+            }
         }
         if (entity.getPersistentDataContainer().has(saturationGrantedKey, PersistentDataType.BYTE) && day < 45) {
             entity.removePotionEffect(PotionEffectType.SATURATION);
