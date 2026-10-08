@@ -211,7 +211,25 @@ public class PDCCommand implements CommandExecutor {
                         //player.sendMessage(instance.format("&"));
 
                     } else if (args[1].equalsIgnoreCase("generate_beginning")) {
-
+                        if (instance.getDay() < 40) {
+                            player.sendMessage(TextUtils.format("&cThe Beginning requiere al menos el día 40."));
+                            return false;
+                        }
+                        if (!Main.worldEditFound) {
+                            player.sendMessage(TextUtils.format("&cNecesitas WorldEdit o FastAsyncWorldEdit para generar The Beginning."));
+                            return false;
+                        }
+                        if (instance.getBeData() == null) {
+                            instance.setBeginningDataForDebug();
+                        }
+                        if (instance.getBeginningManager() == null) {
+                            instance.createBeginningForDebug();
+                        }
+                        if (instance.getBeginningManager() != null && instance.getBeginningManager().getBeginningWorld() != null) {
+                            player.sendMessage(TextUtils.format("&aThe Beginning está disponible en: &f" + instance.getBeginningManager().getBeginningWorld().getName()));
+                        } else {
+                            player.sendMessage(TextUtils.format("&cNo se pudo generar The Beginning."));
+                        }
 
                     } else if (args[1].equalsIgnoreCase("toggle")) {
                         Main.DEBUG = !Main.DEBUG;
