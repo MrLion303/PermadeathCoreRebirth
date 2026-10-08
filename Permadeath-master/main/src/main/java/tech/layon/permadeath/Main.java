@@ -361,10 +361,11 @@ public final class Main extends JavaPlugin implements Listener {
                 if (player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() == Material.BEDROCK) {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 10 * 20, 9));
                 }
-                if (player.getWorld().getName().equalsIgnoreCase("pdc_the_beginning")) {
-                    if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-                        player.removePotionEffect(PotionEffectType.INVISIBILITY);
-                    }
+                BeginningManager beginningManager = getBeginningManager();
+                World beginningWorld = beginningManager != null ? beginningManager.getBeginningWorld() : null;
+                if (beginningWorld != null && player.getWorld().equals(beginningWorld)
+                        && player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+                    player.removePotionEffect(PotionEffectType.INVISIBILITY);
                 }
             }
 
