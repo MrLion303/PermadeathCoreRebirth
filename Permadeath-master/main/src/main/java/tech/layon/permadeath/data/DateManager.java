@@ -115,11 +115,13 @@ public class DateManager {
     }
 
     public long getDay() {
+        long day;
         if (Main.SPEED_RUN_MODE) {
-            return instance.getPlayTime() / 3600;
+            day = instance.getPlayTime() / 3600;
         } else {
-            return startDate.until(currentDate, ChronoUnit.DAYS);
+            day = startDate.until(currentDate, ChronoUnit.DAYS);
         }
+        return Math.max(1L, Math.min(60L, day));
     }
 
     public void setNewDate(String value) {
