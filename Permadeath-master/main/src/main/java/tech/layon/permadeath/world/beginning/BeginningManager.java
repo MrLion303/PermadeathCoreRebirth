@@ -209,11 +209,10 @@ public class BeginningManager implements Listener {
     @EventHandler
     public void onCreatePortal(PortalCreateEvent e) {
         if (beginningWorld != null && e.getWorld().equals(beginningWorld)) {
-            for (BlockState s : e.getBlocks()) {
+            for (BlockState s : new ArrayList<>(e.getBlocks())) {
                 Block b = s.getBlock();
                 if (b.getType() == Material.END_GATEWAY || b.getType() == Material.BEDROCK || s instanceof EndGateway) {
                     if (b.getChunk().getX() == 0 && b.getChunk().getZ() == 0) {
-                        e.getBlocks().remove(s);
                         s.setType(Material.AIR);
                     }
                 }
