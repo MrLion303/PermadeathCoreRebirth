@@ -640,6 +640,8 @@ public final class Main extends JavaPlugin implements Listener {
     }
 
     private void registerListeners() {
+        worldEditFound = Bukkit.getPluginManager().getPlugin("WorldEdit") != null
+                || Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null;
         String prefix = "&e[PermaDeath] &7> ";
 
         if (!registeredDays.get(1)) {
