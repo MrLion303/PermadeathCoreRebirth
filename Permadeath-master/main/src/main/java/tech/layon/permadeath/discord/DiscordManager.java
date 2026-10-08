@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -66,10 +67,11 @@ public class DiscordManager {
                     Objects.requireNonNullElse(configuration.getString("Status"), "¡Permadeath!")));
 
             this.bot = builder.build();
-            this.bot.awaitReady();
 
-            String channelId = configuration.getString("Channels.Anuncios");
-            if (channelId != null && !channelId.isBlank()) {
+            Bukkit.getScheduler().runTaskLater(instance, () -> {
+                if (bot == null) return;
+                String channelId = configuration.getString("Channels.Anuncios");
+                if (channelId == null || channelId.isBlank()) return;
                 TextChannel channel = bot.getTextChannelById(channelId);
                 if (channel != null) {
                     sendEmbed(channel, buildEmbed(
@@ -80,7 +82,7 @@ public class DiscordManager {
                             null,
                             ":gear: Plugin encendido."));
                 }
-            }
+            }, 20L);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             log("Se interrumpió el inicio de sesión con la aplicación de Discord.");
@@ -97,6 +99,20 @@ public class DiscordManager {
             discordManager = new DiscordManager();
         }
         return discordManager;
+    }
+
+    public static void reload() {
+        if (discordManager != null) {
+            discordManager.onDisable();
+        }
+        discordManager = new DiscordManager();
+    }
+
+    public static void shutdown() {
+        if (discordManager != null) {
+            discordManager.onDisable();
+            discordManager = null;
+        }
     }
 
     public void onDisable() {
