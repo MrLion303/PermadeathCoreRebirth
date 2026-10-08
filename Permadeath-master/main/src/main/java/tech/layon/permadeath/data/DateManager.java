@@ -104,9 +104,9 @@ public class DateManager {
         if (Bukkit.getOnlinePlayers() != null && Bukkit.getOnlinePlayers().size() >= 1) {
             for (OfflinePlayer off : Bukkit.getOfflinePlayers()) {
 
-                if (off == null) return;
+                if (off == null) continue;
 
-                if (off.isBanned()) return;
+                if (off.isBanned()) continue;
 
                 PlayerDataManager manager = new PlayerDataManager(off.getName(), instance);
                 manager.setLastDay(getDay());
