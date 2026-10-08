@@ -636,17 +636,25 @@ public final class Main extends JavaPlugin implements Listener {
             Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado los cambios de Mobs pacíficos hostiles."));
         }
 
-        if (DateManager.getInstance().getDay() >= 30 && endManager == null && endData == null && !registeredDays.get(30)) {
-            registeredDays.replace(30, true);
+        if (DateManager.getInstance().getDay() >= 30) {
+            if (endManager == null || endData == null) {
+                this.endData = new EndDataManager(instance);
+                this.endManager = new EndManager(instance);
+                getServer().getPluginManager().registerEvents(this.endManager, instance);
+                registeredDays.replace(30, true);
 
-            this.endData = new EndDataManager(instance);
-            this.endManager = new EndManager(instance);
-            getServer().getPluginManager().registerEvents(this.endManager, instance);
-            this.endManager.prepareEnd(this.endData);
+                if (runningPaperSpigot) {
+                    getServer().getPluginManager().registerEvents(new PaperListeners(instance), instance);
+                    Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios especiales para &c&lPaperMC&e."));
+                }
+            }
 
-            if (runningPaperSpigot) {
-                getServer().getPluginManager().registerEvents(new PaperListeners(instance), instance);
-                Bukkit.getConsoleSender().sendMessage(TextUtils.format(prefix + "&eSe han registrado cambios especiales para &c&lPaperMC&e."));
+            // Si WorldEdit/FAWE se instaló después de arrancar, la preparación pendiente
+            // se reintentará sin reiniciar el plugin.
+            worldEditFound = Bukkit.getPluginManager().getPlugin("WorldEdit") != null
+                    || Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null;
+            if (!endData.isReplacedObsidian() || !endData.isCreatedRegenZone()) {
+                this.endManager.prepareEnd(this.endData);
             }
         }
 
