@@ -884,8 +884,13 @@ public final class Main extends JavaPlugin implements Listener {
             return;
         }
 
-        World beginningWorld = Bukkit.getWorld("pdc_the_beginning");
+        BeginningManager beginningManager = getBeginningManager();
+        World beginningWorld = beginningManager != null ? beginningManager.getBeginningWorld() : null;
         if (beginningWorld == null || !event.getTo().getWorld().equals(beginningWorld)) {
+            return;
+        }
+
+        if (world == null) {
             return;
         }
 
