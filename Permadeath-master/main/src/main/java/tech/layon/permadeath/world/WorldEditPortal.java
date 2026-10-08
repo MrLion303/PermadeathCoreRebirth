@@ -66,13 +66,13 @@ public class WorldEditPortal {
                 }
                 if (resource == null) {
                     Main.getInstance().getLogger().warning("No se encontró el schematic " + resourcePath + " para la isla del End.");
-                    return;
+                    return false;
                 }
                 ClipboardFormat resourceFormat = ClipboardFormats.findByFile(new File("island" + schematic + ".schem"));
                 if (resourceFormat == null) {
                     Main.getInstance().getLogger().warning("WorldEdit no reconoce el formato del schematic de la isla " + schematic + ".");
                     resource.close();
-                    return;
+                    return false;
                 }
                 try (InputStream stream = resource; ClipboardReader reader = resourceFormat.getReader(stream)) {
                     clipboard = reader.read();
@@ -134,8 +134,10 @@ public class WorldEditPortal {
 
             Operations.complete(operation);
             //editSession.replaceBlocks(
+            return true;
         } catch (WorldEditException e) {
             e.printStackTrace();
+            return false;
         }
     }
     public static void generatePortal(boolean overworld, Location to) {
@@ -164,39 +166,64 @@ public class WorldEditPortal {
 
             highestBlockAt = highestBlockAt + 15;
             loc.setY(highestBlockAt);
-            pasteSchematic(loc, new File(Main.getInstance().getDataFolder().getAbsolutePath() + "/schematics/beginning_portal.schem"));
-            Main.getInstance().getBeData().setOverWorldPortal(loc);
+            if (pasteSchematic(loc, new File(Main.getInstance().getDataFolder().getAbsolutePath() + "/schematics/beginning_portal.schem"))) {
+                Main.getInstance().getBeData().setOverWorldPortal(loc);
+            }
         }
 
         if (!Main.getInstance().getBeData().generatedBeginningPortal() && !overworld) {
-            Bukkit.getWorld("pdc_the_beginning").loadChunk(to.getChunk());
-
-            pasteSchematic(to, new File(Main.getInstance().getDataFolder().getAbsolutePath() + "/schematics/beginning_portal.schem"));
-            Main.getInstance().getBeData().setBeginningPortal(to);
+            World beginning = Main.getInstance().getBeginningManager() != null
+                    ? Main.getInstance().getBeginningManager().getBeginningWorld()
+                    : Bukkit.getWorld("pdc_the_beginning");
+            if (beginning == null) return;
+            beginning.loadChunk(to.getChunk());
+            if (pasteSchematic(to, new File(Main.getInstance().getDataFolder().getAbsolutePath() + "/schematics/beginning_portal.schem"))) {
+                Main.getInstance().getBeData().setBeginningPortal(to);
+            }
         }
     }
 
-    public static void pasteSchematic(Location loc, File schematic) {
+    public static boolean pasteSchematic(Location loc, File schematic) {
         com.sk89q.worldedit.world.World adaptedWorld = BukkitAdapter.adapt(loc.getWorld());
         ClipboardFormat format = ClipboardFormats.findByFile(schematic);
-        try (ClipboardReader reader = format.getReader(new FileInputStream(schematic))) {
-            Clipboard clipboard = reader.read();
-            try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(adaptedWorld,
-                    -1)) {
-                Operation operation = new ClipboardHolder(clipboard).createPaste(editSession)
-                        .to(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ())).ignoreAirBlocks(true).build();
-                try {
-                    Operations.complete(operation);
-                    editSession.flushSession();
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
+        try {
+            Clipboard clipboard;
+            if (format != null && schematic.isFile()) {
+                try (ClipboardReader reader = format.getReader(new FileInputStream(schematic))) {
+                    clipboard = reader.read();
+                }
+            } else {
+                String name = schematic.getName();
+                InputStream resource = Main.getInstance().getResource("updated_schematics/" + name);
+                if (resource == null) resource = Main.getInstance().getResource("original_schematics/" + name);
+                if (resource == null) {
+                    Main.getInstance().getLogger().warning("No se encontró el schematic " + name + ".");
+                    return false;
+                }
+                ClipboardFormat resourceFormat = ClipboardFormats.findByFile(new File(name));
+                if (resourceFormat == null) {
+                    resource.close();
+                    Main.getInstance().getLogger().warning("WorldEdit no reconoce el formato de " + name + ".");
+                    return false;
+                }
+                try (InputStream stream = resource; ClipboardReader reader = resourceFormat.getReader(stream)) {
+                    clipboard = reader.read();
                 }
             }
-        } catch (FileNotFoundException e) {
+
+            try (EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(adaptedWorld, -1)) {
+                Operation operation = new ClipboardHolder(clipboard)
+                        .createPaste(editSession)
+                        .to(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()))
+                        .ignoreAirBlocks(true)
+                        .build();
+                Operations.complete(operation);
+                editSession.flushSession();
+                return true;
+            }
+        } catch (IOException | WorldEditException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
     }
 }
-
