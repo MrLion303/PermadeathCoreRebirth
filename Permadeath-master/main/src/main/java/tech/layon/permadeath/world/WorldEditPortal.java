@@ -144,16 +144,17 @@ public class WorldEditPortal {
 
         if (!Main.getInstance().getBeData().generatedOverWorldBeginningPortal() && overworld) {
 
-            int x = Main.getInstance().getConfig().getInt("TheBeginning.X-Limit");
-            int z = Main.getInstance().getConfig().getInt("TheBeginning.Z-Limit");
+            int x = Math.max(1, Main.getInstance().getConfig().getInt("TheBeginning.X-Limit"));
+            int z = Math.max(1, Main.getInstance().getConfig().getInt("TheBeginning.Z-Limit"));
+            Random random = new Random();
 
-            int ranX = new Random().nextInt(x);
-            int ranZ = new Random().nextInt(z);
+            int ranX = random.nextInt(x);
+            int ranZ = random.nextInt(z);
 
-            if (new Random().nextBoolean()) {
+            if (random.nextBoolean()) {
                 ranX = ranX * -1;
             }
-            if (new Random().nextBoolean()) {
+            if (random.nextBoolean()) {
 
                 ranZ = ranZ * -1;
             }
