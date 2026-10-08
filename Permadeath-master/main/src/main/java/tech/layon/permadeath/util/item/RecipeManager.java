@@ -200,7 +200,7 @@ public class RecipeManager {
 
         try {
             instance.getServer().removeRecipe(key);
-        instance.getServer().addRecipe(recipe);
+            instance.getServer().addRecipe(recipe);
         } catch (Exception x) {
         }
     }
@@ -222,7 +222,7 @@ public class RecipeManager {
 
         ItemStack s = PermadeathItems.createLifeOrb();
 
-        NamespacedKey key = new NamespacedKey(instance, "PERMADEATHCORE_LIFO");
+        NamespacedKey key = new NamespacedKey(instance, "permadeathcore_lifo");
         ShapedRecipe recipe = new ShapedRecipe(key, s);
         recipe.shape("DGB", "RSE", "NOL");
         recipe.setIngredient('D', Material.DIAMOND);
