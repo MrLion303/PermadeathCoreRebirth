@@ -326,6 +326,8 @@ public final class Main extends JavaPlugin implements Listener {
 
         final String time = String.format((days >= 1 ? String.format("%02d día(s) ", days) : "") + "%02d:%02d:%02d", hours, minutes, seconds);
 
+        this.doneEffectPlayers.removeIf(player -> player == null || !player.isOnline());
+
         for (Player player : Bukkit.getOnlinePlayers()) {
 
             World w = player.getWorld();
