@@ -206,13 +206,8 @@ public final class Main extends JavaPlugin implements Listener {
                     reloadConfig();
                     startPlugin();
 
-                    if (getConfig().getBoolean("Toggles.Replace-Mobs-On-Chunk-Load")) {
-                        for (World worlds : Bukkit.getWorlds()) {
-                            for (LivingEntity liv : worlds.getLivingEntities()) {
-                                spawnListener.applyDayChanges(liv);
-                            }
-                        }
-                    }
+                    // Los mobs existentes no se reprocesan al arrancar.
+                    // La dificultad se fija únicamente cuando el mob aparece.
                     loaded = true;
                 }
 
