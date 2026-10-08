@@ -87,14 +87,14 @@ public class TotemListener implements Listener {
 
     private int countTotems(Player p) {
         int total = 0;
-        for (ItemStack item : p.getInventory().getContents()) {
+        for (ItemStack item : p.getInventory().getStorageContents()) {
             if (item != null && item.getType() == Material.TOTEM_OF_UNDYING) {
                 total += item.getAmount();
             }
         }
         ItemStack off = p.getInventory().getItemInOffHand();
         if (off != null && off.getType() == Material.TOTEM_OF_UNDYING) {
-            // getContents() ya incluye el offhand en Bukkit; no duplicarlo.
+            total += off.getAmount();
         }
         return total;
     }
