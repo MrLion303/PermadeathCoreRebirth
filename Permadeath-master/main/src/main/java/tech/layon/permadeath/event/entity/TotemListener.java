@@ -29,7 +29,7 @@ public class TotemListener implements Listener {
         Main plugin = Main.getInstance();
         if (!plugin.getConfig().getBoolean("TotemFail.Enable")) return;
 
-        int day = plugin.getDay();
+        long day = plugin.getDay();
         String sectionPath = "TotemFail.FailProbs." + day;
         if (!plugin.getConfig().contains(sectionPath)) return;
 
