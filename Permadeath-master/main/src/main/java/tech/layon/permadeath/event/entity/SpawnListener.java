@@ -662,34 +662,35 @@ public class SpawnListener implements Listener {
             if (entity instanceof Cow || entity instanceof Sheep || entity instanceof Pig || entity instanceof MushroomCow) {
                 if (!entity.getLocation().getWorld().getName().equalsIgnoreCase(plugin.world.getName())) return;
 
-                if (plugin.getDay() < 50 && plugin.getDay() >= 40) {
-                    entity.remove();
-                    plugin.getNmsHandler().spawnNMSEntity("Ravager", EntityType.RAVAGER, entity.getLocation(), CreatureSpawnEvent.SpawnReason.NATURAL);
-                }
+                Location location = entity.getLocation().clone();
+                entity.remove();
 
                 if (plugin.getDay() >= 50) {
-                    entity.remove();
-                    Ravager ultraRavager = (Ravager) plugin.getNmsHandler().spawnNMSCustomEntity("UltraRavager", EntityType.RAVAGER, entity.getLocation(), CreatureSpawnEvent.SpawnReason.CUSTOM);
-                    ultraRavager.setCustomName(TextUtils.format("&6Ultra Ravager"));
-                    ultraRavager.setCustomNameVisible(true);
-                    ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-                    ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1));
-                    plugin.getNmsAccessor().setMaxHealth(ultraRavager, 500.0D, true);
+                    spawnUltraRavagerAt(location);
+                } else {
+                    plugin.getNmsHandler().spawnNMSEntity("Ravager", EntityType.RAVAGER, location, CreatureSpawnEvent.SpawnReason.NATURAL);
                 }
             }
 
             if (entity instanceof Chicken) {
-
-                if (plugin.getDay() < 50 && plugin.getDay() >= 40) {
-                    entity.remove();
-                    plugin.getNmsHandler().spawnNMSEntity("Ravager", EntityType.RAVAGER, entity.getLocation(), CreatureSpawnEvent.SpawnReason.NATURAL);
-                    return;
-                }
+                Location location = entity.getLocation().clone();
+                entity.remove();
 
                 if (plugin.getDay() >= 50) {
-                    entity.getLocation().getWorld().spawnEntity(entity.getLocation(), EntityType.SILVERFISH);
-                    entity.remove();
+                    location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
+                } else {
+                    plugin.getNmsHandler().spawnNMSEntity("Ravager", EntityType.RAVAGER, location, CreatureSpawnEvent.SpawnReason.NATURAL);
                 }
+            }
+
+            // Desde el día 50 todos los Ravagers existentes pasan a ser Ultra Ravagers.
+            if (entity instanceof Ravager
+                    && !entity.getPersistentDataContainer().has(
+                    new NamespacedKey(plugin, "ultra_ravager"),
+                    PersistentDataType.BYTE)) {
+                Location location = entity.getLocation().clone();
+                entity.remove();
+                spawnUltraRavagerAt(location);
             }
         }
 
@@ -1257,6 +1258,20 @@ public class SpawnListener implements Listener {
             event.getDrops().clear();
             event.getDrops().add(NetheriteArmor.craftNetheriteBoots());
         }
+    }
+
+    private void spawnUltraRavagerAt(Location location) {
+        Ravager ultraRavager = (Ravager) location.getWorld().spawnEntity(location, EntityType.RAVAGER);
+        ultraRavager.setCustomName(TextUtils.format("&6Ultra Ravager"));
+        ultraRavager.setCustomNameVisible(true);
+        ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+        ultraRavager.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1));
+        plugin.getNmsAccessor().setMaxHealth(ultraRavager, 500.0D, true);
+        ultraRavager.setHealth(500.0D);
+        ultraRavager.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "ultra_ravager"),
+                PersistentDataType.BYTE,
+                (byte) 1);
     }
 
     private void spawnUltraRavager(CreatureSpawnEvent event) {
