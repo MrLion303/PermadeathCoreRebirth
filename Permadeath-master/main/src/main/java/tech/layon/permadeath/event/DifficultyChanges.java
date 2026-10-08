@@ -105,6 +105,11 @@ public final class DifficultyChanges implements Listener {
                 continue;
             }
 
+            if (day < 45 && player.getPersistentDataContainer().has(saturationGrantedKey, PersistentDataType.BYTE)) {
+                player.removePotionEffect(PotionEffectType.SATURATION);
+                player.getPersistentDataContainer().remove(saturationGrantedKey);
+            }
+
             // Día 25: herramientas antiguas y armadura de Netherite vanilla arden.
             if (hasBurningDay25Item(player)) {
                 applyInstantDamage(player, 0);
