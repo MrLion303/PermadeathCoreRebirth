@@ -119,11 +119,8 @@ public class BeginningManager implements Listener {
         }
 
         if (main.getDay() < 50) {
-            if (e.getPlayer().getWorld().equals(main.world) || (beginningWorld != null && e.getPlayer().getWorld().equals(beginningWorld))) {
-                e.getPlayer().setNoDamageTicks(e.getPlayer().getMaximumNoDamageTicks());
-                e.getPlayer().damage(e.getPlayer().getHealth() + 1.0D);
-                e.getPlayer().setNoDamageTicks(0);
-                Bukkit.broadcastMessage(TextUtils.format("&c&lEl jugador &4&l" + e.getPlayer().getName() + " &c&lentró a TheBeginning antes de tiempo."));
+            if (main.world != null) {
+                e.setTo(main.world.getSpawnLocation().clone());
             }
             return;
         }
