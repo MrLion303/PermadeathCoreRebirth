@@ -111,7 +111,10 @@ public class WorldEditPortal {
             }
             ClipboardFormat resourceFormat = ClipboardFormats.findByFile(new File("ytic.schem"));
             if (resourceFormat == null) {
-                resource.close();
+                try {
+                    resource.close();
+                } catch (IOException ignored) {
+                }
                 Main.getInstance().getLogger().warning("WorldEdit no reconoce el formato de ytic.schem.");
                 return false;
             }
