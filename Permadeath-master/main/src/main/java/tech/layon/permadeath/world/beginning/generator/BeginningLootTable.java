@@ -1,7 +1,6 @@
 package tech.layon.permadeath.world.beginning.generator;
 
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -38,9 +37,7 @@ public class BeginningLootTable {
 
     public void populateChest(Chest chest) {
 
-        World w = chest.getWorld();
         Inventory inv = chest.getBlockInventory();
-        if (!w.getName().equalsIgnoreCase("pdc_the_beginning")) return;
         if (inv.contains(Material.DIAMOND_PICKAXE)) return;
         alreadyRolled.clear();
         roll(chest);
