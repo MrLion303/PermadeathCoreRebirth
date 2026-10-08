@@ -933,7 +933,7 @@ public final class Main extends JavaPlugin implements Listener {
     private void removeConsoleFilter() {
         try {
             if (rootLogFilter != null) {
-                ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).removeFilter(rootLogFilter);
+                ((org.apache.logging.log4j.core.LoggerContext) LogManager.getContext(false)).removeFilter(rootLogFilter);
                 rootLogFilter = null;
             }
         } catch (Throwable ignored) {
