@@ -47,7 +47,7 @@ public class EndDataManager {
 
         if (!config.contains("ReplacedObsidian")) {
 
-            config.set("ReplacedObsidian", true);
+            config.set("ReplacedObsidian", false);
         }
 
         if (!config.contains("CreatedRegenZone")) {
