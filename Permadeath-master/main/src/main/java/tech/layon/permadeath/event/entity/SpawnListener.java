@@ -12,7 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -638,34 +637,11 @@ public class SpawnListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onChunkLoad(ChunkLoadEvent e) {
-        if (plugin.getConfig().getBoolean("Toggles.Replace-Mobs-On-Chunk-Load")) {
-            for (LivingEntity liv : Arrays.stream(e.getChunk().getEntities()).filter(entity -> entity instanceof LivingEntity).map(LivingEntity.class::cast).collect(Collectors.toList())) {
-                applyDayChanges(liv);
-            }
-        }
-
-        if (plugin.getDay() >= 40 && plugin.getDay() < 50) {
-            for (LivingEntity cats : Arrays.stream(e.getChunk().getEntities()).filter(entity -> isACat(entity)).map(LivingEntity.class::cast).collect(Collectors.toList())) {
-                cats.setCustomName(TextUtils.format("&6Gato Supernova"));
-                explodeCat(cats);
-            }
-
-            for (Wolf wolf : Arrays.stream(e.getChunk().getEntities()).filter(entity -> entity instanceof Wolf).map(Wolf.class::cast).collect(Collectors.toList())) {
-                Cat cat = wolf.getWorld().spawn(wolf.getLocation().clone(), Cat.class);
-                wolf.remove();
-                cat.setAdult();
-                cat.setCustomName(TextUtils.format("&6Gato Supernova"));
-                explodeCat(cat);
-            }
-        }
-    }
-
-    private boolean isACat(Entity entity) {
-        return entity.getType() == EntityType.CAT || entity.getType() == EntityType.OCELOT;
-    }
-
+    /*
+     * Las modificaciones de dificultad se aplican al crear el mob, no al cargar
+     * chunks. Esto es intencional: un mob que ya existía conserva para siempre
+     * la versión de dificultad que recibió cuando apareció.
+     */
     public void applyDayChanges(LivingEntity entity) {
 
         if (plugin.getDay() >= 30) {
