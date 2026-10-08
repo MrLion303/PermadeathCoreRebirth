@@ -831,6 +831,11 @@ public final class Main extends JavaPlugin implements Listener {
         this.messages.reloadFiles();
         DateManager.getInstance().reloadDate();
         setupWorld();
+        if (this.world == null || this.endWorld == null) {
+            sender.sendMessage(TextUtils.format("&cNo se pudo recargar el plugin porque faltan los mundos requeridos. Revisa Worlds.MainWorld y Worlds.EndWorld."));
+            PDCLog.getInstance().log("[ERROR] /pdc reload cancelado: no se pudieron resolver los mundos requeridos.");
+            return;
+        }
         resetDaySystems();
         registerListeners();
         if (this.recipes != null) {
