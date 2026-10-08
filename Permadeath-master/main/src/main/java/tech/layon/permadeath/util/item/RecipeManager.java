@@ -94,6 +94,7 @@ public class RecipeManager {
         recipe.setIngredient('B', Material.DIAMOND_BLOCK);
         recipe.setIngredient('D', Material.LIGHT_BLUE_DYE);
         recipe.setIngredient('S', Material.SHULKER_SHELL);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -106,6 +107,7 @@ public class RecipeManager {
         recipe.shape("III", "IPI", "III");
         recipe.setIngredient('I', Material.DIAMOND);
         recipe.setIngredient('P', Material.ELYTRA);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -117,6 +119,7 @@ public class RecipeManager {
         recipe.shape(" I ", "IPI", " I ");
         recipe.setIngredient('I', Material.DIAMOND);
         recipe.setIngredient('P', Material.LEATHER_HELMET);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -128,6 +131,7 @@ public class RecipeManager {
         recipe.shape(" I ", "IPI", " I ");
         recipe.setIngredient('I', Material.DIAMOND);
         recipe.setIngredient('P', Material.LEATHER_CHESTPLATE);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -139,6 +143,7 @@ public class RecipeManager {
         recipe.shape(" I ", "IPI", " I ");
         recipe.setIngredient('I', Material.DIAMOND);
         recipe.setIngredient('P', Material.LEATHER_LEGGINGS);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -150,6 +155,7 @@ public class RecipeManager {
         recipe.shape(" I ", "IPI", " I ");
         recipe.setIngredient('I', Material.DIAMOND);
         recipe.setIngredient('P', Material.LEATHER_BOOTS);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -167,6 +173,7 @@ public class RecipeManager {
         recipe.shape(" S ", " D ", " S ");
         recipe.setIngredient('S', Material.SHULKER_SHELL);
         recipe.setIngredient('D', Material.DIAMOND_BLOCK);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -174,7 +181,9 @@ public class RecipeManager {
 
         for (Material m : Material.values()) {
             if (m.name().toLowerCase().contains("shulker_box")) {
-                Bukkit.addRecipe(new ShapelessRecipe(new NamespacedKey(instance, m.name().toLowerCase() + "_uncraft"), new ItemStack(Material.SHULKER_SHELL, 2)).addIngredient(m));
+                NamespacedKey key = new NamespacedKey(instance, m.name().toLowerCase() + "_uncraft");
+                Bukkit.removeRecipe(key);
+                Bukkit.addRecipe(new ShapelessRecipe(key, new ItemStack(Material.SHULKER_SHELL, 2)).addIngredient(m));
             }
         }
     }
@@ -190,7 +199,8 @@ public class RecipeManager {
         recipe.setIngredient('A', Material.GOLDEN_APPLE);
 
         try {
-            instance.getServer().addRecipe(recipe);
+            instance.getServer().removeRecipe(key);
+        instance.getServer().addRecipe(recipe);
         } catch (Exception x) {
         }
     }
@@ -204,6 +214,7 @@ public class RecipeManager {
         recipe.shape("GGG", "GAG", "GGG");
         recipe.setIngredient('G', Material.GOLD_INGOT);
         recipe.setIngredient('A', Material.GOLDEN_APPLE);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 
@@ -223,6 +234,7 @@ public class RecipeManager {
         recipe.setIngredient('N', Material.NETHER_BRICKS);
         recipe.setIngredient('O', Material.OBSIDIAN);
         recipe.setIngredient('L', Material.LAPIS_BLOCK);
+        instance.getServer().removeRecipe(key);
         instance.getServer().addRecipe(recipe);
     }
 }
