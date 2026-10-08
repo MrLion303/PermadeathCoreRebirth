@@ -161,7 +161,7 @@ public class BeginningManager implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent e) {
         Player p = e.getPlayer();
-        if (p.getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+        if (beginningWorld != null && p.getWorld().equals(beginningWorld)) {
             if (e.getBlock().getState() instanceof Chest) {
                 Chest chest = (Chest) e.getBlock().getState();
                 populateChest(chest);
@@ -177,7 +177,7 @@ public class BeginningManager implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if (e.getClickedBlock() != null && p.getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+        if (e.getClickedBlock() != null && beginningWorld != null && p.getWorld().equals(beginningWorld)) {
             if (e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 if (e.getClickedBlock().getState() instanceof Chest) {
                     Chest chest = (Chest) e.getClickedBlock().getState();
@@ -208,7 +208,7 @@ public class BeginningManager implements Listener {
 
     @EventHandler
     public void onCreatePortal(PortalCreateEvent e) {
-        if (e.getWorld().getName().equalsIgnoreCase(beginningWorld.getName())) {
+        if (beginningWorld != null && e.getWorld().equals(beginningWorld)) {
             for (BlockState s : e.getBlocks()) {
                 Block b = s.getBlock();
                 if (b.getType() == Material.END_GATEWAY || b.getType() == Material.BEDROCK || s instanceof EndGateway) {
