@@ -693,15 +693,16 @@ public class SpawnListener implements Listener {
             }
 
             if (entity instanceof Cow || entity instanceof Sheep || entity instanceof Pig || entity instanceof MushroomCow) {
-                if (!entity.getLocation().getWorld().getName().equalsIgnoreCase(plugin.world.getName())) return;
+                World entityWorld = entity.getWorld();
+                if (plugin.world != null && entityWorld.getName().equalsIgnoreCase(plugin.world.getName())) {
+                    Location location = entity.getLocation().clone();
+                    entity.remove();
 
-                Location location = entity.getLocation().clone();
-                entity.remove();
-
-                if (plugin.getDay() >= 50) {
-                    spawnUltraRavagerAt(location);
-                } else {
-                    plugin.getNmsHandler().spawnNMSEntity("Ravager", EntityType.RAVAGER, location, CreatureSpawnEvent.SpawnReason.NATURAL);
+                    if (plugin.getDay() >= 50) {
+                        spawnUltraRavagerAt(location);
+                    } else {
+                        plugin.getNmsHandler().spawnNMSEntity("Ravager", EntityType.RAVAGER, location, CreatureSpawnEvent.SpawnReason.NATURAL);
+                    }
                 }
             }
 
