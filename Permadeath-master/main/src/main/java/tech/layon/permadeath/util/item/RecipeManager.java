@@ -63,7 +63,7 @@ public class RecipeManager {
             remove("end_relic");
             for (Material material : Material.values()) {
                 if (material.name().toLowerCase().contains("shulker_box")) {
-                    remove(material.name() + "_uncraft");
+                    remove(material.name().toLowerCase() + "_uncraft");
                 }
             }
         }
@@ -75,7 +75,7 @@ public class RecipeManager {
         }
         if (day < 60) {
             remove("infernal_elytra");
-            remove("PERMADEATH_LIFO");
+            remove("permadeathcore_lifo");
             remove("beginning_relic");
         }
     }
@@ -174,7 +174,7 @@ public class RecipeManager {
 
         for (Material m : Material.values()) {
             if (m.name().toLowerCase().contains("shulker_box")) {
-                Bukkit.addRecipe(new ShapelessRecipe(new NamespacedKey(instance, m.name() + "_uncraft"), new ItemStack(Material.SHULKER_SHELL, 2)).addIngredient(m));
+                Bukkit.addRecipe(new ShapelessRecipe(new NamespacedKey(instance, m.name().toLowerCase() + "_uncraft"), new ItemStack(Material.SHULKER_SHELL, 2)).addIngredient(m));
             }
         }
     }
