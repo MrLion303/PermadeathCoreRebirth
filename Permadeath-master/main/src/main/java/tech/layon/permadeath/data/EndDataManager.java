@@ -83,6 +83,24 @@ public class EndDataManager {
         return timeList;
     }
 
+    public boolean isCreatedRegenZone() {
+        return config.getBoolean("CreatedRegenZone", false);
+    }
+
+    public boolean isReplacedObsidian() {
+        return config.getBoolean("ReplacedObsidian", false);
+    }
+
+    public void setCreatedRegenZone(boolean value) {
+        config.set("CreatedRegenZone", value);
+        saveFile();
+    }
+
+    public void setReplacedObsidian(boolean value) {
+        config.set("ReplacedObsidian", value);
+        saveFile();
+    }
+
     public void saveFile() {
 
         try {
