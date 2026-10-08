@@ -659,6 +659,32 @@ public class SpawnListener implements Listener {
         }
 
         if (plugin.getDay() >= 40) {
+            // Estas conversiones son transformaciones globales: si el día ya llegó,
+            // también afectan a entidades que existían antes del cambio.
+            if (entity instanceof Zombie) {
+                Location location = entity.getLocation().clone();
+                entity.remove();
+                Vindicator vindicator = (Vindicator) location.getWorld().spawnEntity(location, EntityType.VINDICATOR);
+                vindicator.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 0));
+                plugin.getNmsAccessor().setMaxHealth(vindicator,
+                        plugin.getNmsAccessor().getMaxHealth(vindicator) * 2.0D, true);
+            }
+
+            if (entity instanceof Wolf) {
+                Location location = entity.getLocation().clone();
+                entity.remove();
+                plugin.getNmsHandler().spawnNMSEntity("Cat", EntityType.CAT, location,
+                        CreatureSpawnEvent.SpawnReason.NATURAL);
+            }
+
+            if (entity instanceof Enderman
+                    && entity.getWorld().getEnvironment() == World.Environment.NETHER) {
+                Location location = entity.getLocation().clone();
+                entity.remove();
+                Creeper creeper = plugin.getFactory().spawnEnderCreeper(location, null);
+                creeper.setMetadata("nether_creeper", new FixedMetadataValue(plugin, true));
+            }
+
             if (entity instanceof Cow || entity instanceof Sheep || entity instanceof Pig || entity instanceof MushroomCow) {
                 if (!entity.getLocation().getWorld().getName().equalsIgnoreCase(plugin.world.getName())) return;
 
