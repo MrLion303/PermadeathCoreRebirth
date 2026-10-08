@@ -108,6 +108,7 @@ public final class Main extends JavaPlugin implements Listener {
     private Listener paperListeners;
     private boolean beginningWarningShown = false;
     private int witherTimer = 0;
+    private long lastGlobalMobDay = -1L;
     private int eventTickAccumulator = 0;
     private org.apache.logging.log4j.core.Filter rootLogFilter;
     private Filter legacyLogFilter;
@@ -217,6 +218,12 @@ public final class Main extends JavaPlugin implements Listener {
                 DateManager.getInstance().tick();
                 registerListeners();
 
+                long currentGlobalMobDay = getDay();
+                if (lastGlobalMobDay != currentGlobalMobDay) {
+                    applyGlobalMobChanges();
+                    lastGlobalMobDay = currentGlobalMobDay;
+                }
+
                 if (Bukkit.getOnlinePlayers().size() >= 1 && SPEED_RUN_MODE) {
                     playTime++;
 
@@ -284,6 +291,30 @@ public final class Main extends JavaPlugin implements Listener {
                 tickWorlds();
             }
         }, 0, 30L);
+    }
+
+    /**
+     * Reprocesa las entidades cargadas cuando cambia el día.
+     *
+     * Solo se ejecutan aquí transformaciones globales e irreversibles. No se
+     * vuelven a aplicar las modificaciones de spawn (equipamiento, tiradas,
+     * variantes aleatorias, etc.), evitando convertir un cambio de día en un
+     * buff retroactivo de todo el servidor.
+     */
+    private void applyGlobalMobChanges() {
+        if (spawnListener == null && hostile == null) return;
+
+        for (World world : Bukkit.getWorlds()) {
+            for (LivingEntity entity : new ArrayList<>(world.getLivingEntities())) {
+                if (entity.isDead()) continue;
+                if (spawnListener != null) {
+                    spawnListener.applyDayChanges(entity);
+                }
+                if (hostile != null) {
+                    hostile.applyToExisting(entity);
+                }
+            }
+        }
     }
 
     private void tickWorlds() {
