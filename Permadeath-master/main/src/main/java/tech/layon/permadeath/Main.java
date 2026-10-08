@@ -150,6 +150,7 @@ public final class Main extends JavaPlugin implements Listener {
         reloadConfig();
 
         DiscordPortal.onDisable();
+        DateManager.reset();
         removeConsoleFilter();
 
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&f&m------------------------------------------"));
