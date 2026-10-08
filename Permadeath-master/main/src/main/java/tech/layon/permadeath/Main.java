@@ -101,6 +101,8 @@ public final class Main extends JavaPlugin implements Listener {
     private DifficultyChanges difficultyChanges;
     private boolean beginningWarningShown = false;
     private int witherTimer = 0;
+    private org.apache.logging.log4j.core.Filter rootLogFilter;
+    private Filter legacyLogFilter;
 
     public static boolean optifineItemsEnabled() {
         if (instance == null) return false;
@@ -144,6 +146,7 @@ public final class Main extends JavaPlugin implements Listener {
         reloadConfig();
 
         DiscordPortal.onDisable();
+        removeConsoleFilter();
 
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("&f&m------------------------------------------"));
         Bukkit.getConsoleSender().sendMessage(TextUtils.format("             &c&lPERMADEATH"));
@@ -854,13 +857,32 @@ public final class Main extends JavaPlugin implements Listener {
     private void setupConsoleFilter() {
         try {
             Class.forName("org.apache.logging.log4j.core.filter.AbstractFilter");
-            org.apache.logging.log4j.core.Logger logger;
-            logger = (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
-            logger.addFilter(new Log4JFilter());
+            org.apache.logging.log4j.core.Logger logger =
+                    (org.apache.logging.log4j.core.Logger) LogManager.getRootLogger();
+            removeConsoleFilter();
+            rootLogFilter = new Log4JFilter();
+            logger.addFilter(rootLogFilter);
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
-            Filter f = (Filter) new Log4JFilter();
-            Bukkit.getLogger().setFilter(f);
-            Logger.getLogger("Minecraft").setFilter(f);
+            removeConsoleFilter();
+            legacyLogFilter = new Log4JFilter();
+            Bukkit.getLogger().setFilter(legacyLogFilter);
+            Logger.getLogger("Minecraft").setFilter(legacyLogFilter);
+        }
+    }
+
+    private void removeConsoleFilter() {
+        try {
+            if (rootLogFilter != null) {
+                ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).removeFilter(rootLogFilter);
+                rootLogFilter = null;
+            }
+        } catch (Throwable ignored) {
+        }
+
+        if (legacyLogFilter != null) {
+            Bukkit.getLogger().setFilter(null);
+            Logger.getLogger("Minecraft").setFilter(null);
+            legacyLogFilter = null;
         }
     }
 
